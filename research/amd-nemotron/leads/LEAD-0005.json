@@ -11,7 +11,8 @@
   "correctness_risk": "low for profiling-only work",
   "implementation_cost": "P1 measurement investigation after EXP-0003",
   "priority": "P1",
-  "status": "PRIMARY-MEASUREMENT-ATTEMPT-1-OBSERVER-EFFECT-HOLD",
+  "status": "QUALIFIED-HOLD-DEVICE-COMPLETION-WAIT",
   "investigation": "research/amd-nemotron/investigations/LEAD-0005/",
-  "experiment_policy": "EXP-0004 remains unassigned until LEAD-0005 identifies a causal mechanism and a falsifiable intervention."
+  "experiment_policy": "EXP-0004 remains unassigned: Attempt 2 located 88.61% of the gap in longer waits at identical hipStreamSynchronize points but did not identify a safe falsifiable runtime intervention.",
+  "result": "research/amd-nemotron/investigations/LEAD-0005/ATTEMPT-2.json"
 }

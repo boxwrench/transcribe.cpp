@@ -2,14 +2,14 @@
   "lead_id": "LEAD-0003",
   "source": "profile",
   "observation": "The Q8_0 matrix-vector kernel is the largest GPU kernel family: 20.95% on gfx1100 and 34.39% on gfx1201 across 13,249 calls.",
-  "evidence": ["research/amd-nemotron/profiles/profile-summary.md", "research/amd-nemotron/manifests/shapes/nemotron-streaming-q8_0.json"],
+  "evidence": ["research/amd-nemotron/profiles/profile-summary.md", "research/amd-nemotron/manifests/shapes/nemotron-streaming-q8_0.json", "research/amd-nemotron/phase-map/POST-EXP-0003.json"],
   "affected_phase_shapes": ["1024x1024 attention projections", "1024x4096 and 4096x1024 FFN projections", "skinny N streaming activations"],
-  "wall_clock_share": "20.95% gfx1100 / 34.39% gfx1201 of traced GPU kernel duration; production wall-clock attribution not yet causal",
-  "amdahl_ceiling": "at most 107.1 ms traced GPU time on gfx1100 and 150.1 ms on gfx1201 for impossible total elimination",
+  "wall_clock_share": "Post-EXP-0003 FFN family is 96.89 ms on gfx1100 and 118.71 ms on gfx1201; the repeated 4096x2 -> activation -> 1024x2 chain occurs 3,312 times.",
+  "amdahl_ceiling": "Post-fusion FFN-family impossible-elimination ceiling is 11.27% gfx1100 / 11.98% gfx1201.",
   "suspected_mechanism": "generic Q8_0 matvec geometry underutilizes RDNA for narrow streaming activation shapes",
   "cheapest_falsifier": "shape-matched Q8_0 matvec microbenchmark comparing current geometry with one alternate workgroup/vector configuration before a full kernel family is implemented",
   "correctness_risk": "medium",
   "implementation_cost": "P2 engineering experiment",
-  "priority": "P2",
-  "status": "OPEN-MECHANISM-EXP-0002-FOUR-WAVEFRONTS-KILLED"
+  "priority": "P1",
+  "status": "OPEN-POSTFUSION-PRODUCTION-SHAPES-EXP-0002-GEOMETRY-KILLED"
 }

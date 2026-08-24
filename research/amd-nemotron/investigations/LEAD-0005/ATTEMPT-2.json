@@ -1,0 +1,35 @@
+{
+  "schema": "amd-nemotron-lead-measurement-attempt-v1",
+  "lead_id": "LEAD-0005",
+  "attempt": 2,
+  "decision": "QUALIFIED_HOLD_DEVICE_COMPLETION_WAIT",
+  "method": "request-scoped HIP-runtime-only tracing, three measured requests after two warmups, checked against ten unprofiled requests per target",
+  "local_raw_manifest_sha256": {"gfx1100":"ef80c07d2aab1e1168b0f2b3aa1989fb8173d418fc3b833c4fe982b6bce33e51","gfx1201":"dbc98693303df78e9398668368a16a486496042abeb6b341429095751c555382"},
+  "control_sha256": {"gfx1100":"fd7604c9828af50bf5a1fb087bd93097fe3b9f740a6a2656689a3126b0ab780a","gfx1201":"2bbad39a24ec771c029d41e377b5a024fce3b295a456951be2e1a35aa2dd453a"},
+  "observer_gate": {
+    "gfx1100_control_p50_ms": 830.140,
+    "gfx1100_traced_median_ms": 856.331009,
+    "gfx1100_overhead_pct": 3.15,
+    "gfx1201_control_p50_ms": 985.404,
+    "gfx1201_traced_median_ms": 1009.989277,
+    "gfx1201_overhead_pct": 2.50,
+    "cross_target_direction_preserved": true,
+    "gate": "PASS_LT_5_PERCENT_PER_TARGET"
+  },
+  "median_comparison": {
+    "request_gap_ms": 153.658268,
+    "hip_api_union_gap_ms": 144.398689,
+    "hip_stream_synchronize_gap_ms": 136.156515,
+    "sync_share_of_request_gap_pct": 88.61,
+    "hip_api_call_count": {"gfx1100":47664,"gfx1201":47984},
+    "hip_stream_synchronize_count": {"gfx1100":13826,"gfx1201":13826},
+    "graph_launch": {"gfx1100_count":1700,"gfx1201_count":1700,"gfx1100_ms":7.284639,"gfx1201_ms":7.257934},
+    "graph_instantiate": {"gfx1100_count":26,"gfx1201_count":50,"gfx1100_ms":5.748296,"gfx1201_ms":6.085139},
+    "graph_update": {"gfx1100_count":50,"gfx1201_count":50,"gfx1100_ms":2.715547,"gfx1201_ms":2.637054},
+    "frontend_mel_ms": {"gfx1100":33.237,"gfx1201":32.301},
+    "rnnt_decode_ms_reported": {"gfx1100":0.0,"gfx1201":0.0}
+  },
+  "conclusion": "gfx1201 spends approximately 136 ms/request more inside the same 13,826 hipStreamSynchronize calls. Graph-management duration, call counts, and frontend work do not explain the deficit. The gap surfaces as waiting for device completion, not as a distinct cheap graph or CPU overhead bucket.",
+  "stop_condition": "No falsifiable low-cost runtime intervention follows from a synchronization symptom alone. Park LEAD-0005 and use the post-EXP-0003 phase profile to select model-level work.",
+  "experiment_number": "UNASSIGNED"
+}

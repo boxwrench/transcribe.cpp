@@ -1,0 +1,23 @@
+{
+  "schema": "amd-nemotron-post-exp0003-phase-map-v1",
+  "local_raw_manifest_sha256": {"gfx1100":"feae3affc68e74375669e497f1eef2fdf6d5ce7bb9c34f0a0571d1888ee832c6","gfx1201":"d0fb36d2f808ca6c797b8cadcde03cc69049f75f9299b77ebf3b98360bb3f67a"},
+  "served_baseline_ms": {"gfx1100":859.409,"gfx1201":990.526},
+  "total_kernel_ms": {"gfx1100":435.654665,"gfx1201":406.625900},
+  "phases": [
+    {"phase":"elementwise/layout","gfx1100_kernel_ms":148.890748,"gfx1100_served_ceiling_pct":17.32,"gfx1201_kernel_ms":122.485720,"gfx1201_served_ceiling_pct":12.37},
+    {"phase":"FFN","gfx1100_kernel_ms":96.894942,"gfx1100_served_ceiling_pct":11.27,"gfx1201_kernel_ms":118.714397,"gfx1201_served_ceiling_pct":11.98},
+    {"phase":"convolution","gfx1100_kernel_ms":63.079801,"gfx1100_served_ceiling_pct":7.34,"gfx1201_kernel_ms":68.441409,"gfx1201_served_ceiling_pct":6.91},
+    {"phase":"attention","gfx1100_kernel_ms":66.667887,"gfx1100_served_ceiling_pct":7.76,"gfx1201_kernel_ms":50.814035,"gfx1201_served_ceiling_pct":5.13},
+    {"phase":"cache/state","gfx1100_kernel_ms":33.568050,"gfx1100_served_ceiling_pct":3.91,"gfx1201_kernel_ms":25.040011,"gfx1201_served_ceiling_pct":2.53},
+    {"phase":"runtime/memory","gfx1100_kernel_ms":26.553237,"gfx1100_served_ceiling_pct":3.09,"gfx1201_kernel_ms":21.130328,"gfx1201_served_ceiling_pct":2.13}
+  ],
+  "fusion_validation": {"norm_mul_add_occurrences":0,"norm_mul_add_kernel_calls":0},
+  "repeated_chain_screen": {
+    "minimum_occurrences": 1000,
+    "result": "No pure elementwise/layout chain has a >=3% impossible-elimination ceiling on both targets.",
+    "largest_pure_chain": {"pattern":"ADD[1024x2] -> NORM[1024x2]","occurrences":6625,"gfx1100_ceiling_pct":4.74,"gfx1201_ceiling_pct":2.78},
+    "largest_cross_target_compute_chain": {"pattern":"MUL_MAT[4096x2] -> UNARY[4096x2] -> MUL_MAT[1024x2]","occurrences":3312,"gfx1100_ceiling_pct":11.60,"gfx1201_ceiling_pct":12.32}
+  },
+  "ranking": ["FFN production-shape chain", "convolution direct path", "attention", "pure repeated elementwise/layout chains below threshold"],
+  "next_action": "Qualify an FFN-chain or convolution mechanism before assigning EXP-0004; do not optimize from pre-fusion percentages."
+}

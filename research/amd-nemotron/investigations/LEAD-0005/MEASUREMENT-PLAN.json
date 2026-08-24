@@ -2,7 +2,7 @@
   "schema": "amd-nemotron-lead-investigation-v1",
   "lead_id": "LEAD-0005",
   "classification": "DIAGNOSTIC_MEASUREMENT_NOT_EXPERIMENT",
-  "state": "PRIMARY_ATTEMPT_1_HELD_OBSERVER_EFFECT",
+  "state": "QUALIFIED_HOLD_AFTER_ATTEMPT_2",
   "runtime_commit": "22dbe1c85a299976388ee1ec6b2d4cc7c9da1220",
   "question": "If graph-disabled summed GPU compute is approximately equal on gfx1100 and gfx1201, where does the additional gfx1201 graph-enabled served-request time actually go?",
   "scope_rule": "No optimization work and no EXP number during LEAD-0005. An experiment may be frozen only after this investigation identifies a mechanism and a falsifiable intervention.",

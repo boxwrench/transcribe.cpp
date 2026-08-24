@@ -1,0 +1,15 @@
+{
+  "lead_id": "LEAD-0007",
+  "source": "post-EXP-0003 node-renamed graph-disabled phase profile",
+  "observation": "Convolution remains 63.08 ms on gfx1100 and 68.44 ms on gfx1201 after affine LayerNorm fusion, with 7,349/7,140 dispatched kernels.",
+  "evidence": ["research/amd-nemotron/phase-map/POST-EXP-0003.json"],
+  "affected_phase_shapes": ["streaming depthwise convolution", "CONV_2D_DW", "1024-channel two-frame chunks", "convolution layout/copy neighborhood"],
+  "wall_clock_share": "14.48% gfx1100 / 16.83% gfx1201 of post-fusion graph-disabled kernel time",
+  "amdahl_ceiling": "7.34% gfx1100 / 6.91% gfx1201 versus matched post-fusion served means",
+  "suspected_mechanism": "The narrow streaming depthwise-convolution path and adjacent layout copies may leave a direct contiguous specialization opportunity.",
+  "cheapest_falsifier": "Freeze the complete production convolution shape/layout histogram and benchmark the current CONV_2D_DW path against one direct contiguous specialization before changing served code.",
+  "correctness_risk": "medium: convolution arithmetic and layout changes require tensor and transcript checks",
+  "implementation_cost": "P2 localized kernel investigation",
+  "priority": "P2",
+  "status": "OPEN-POSTFUSION-SECONDARY"
+}

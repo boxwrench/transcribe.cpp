@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -lt 5 || $# -gt 6 ]]; then
-    echo "usage: $0 BUILD_NAME PHYSICAL_GPU TARGET enabled|disabled OUTPUT_DIR [full|device]" >&2
+    echo "usage: $0 BUILD_NAME PHYSICAL_GPU TARGET enabled|disabled OUTPUT_DIR [full|device|host]" >&2
     exit 2
 fi
 
@@ -23,8 +23,8 @@ if [[ "$CONDITION" != enabled && "$CONDITION" != disabled ]]; then
     echo "error: condition must be enabled or disabled" >&2
     exit 2
 fi
-if [[ "$TRACE_MODE" != full && "$TRACE_MODE" != device ]]; then
-    echo "error: trace mode must be full or device" >&2
+if [[ "$TRACE_MODE" != full && "$TRACE_MODE" != device && "$TRACE_MODE" != host ]]; then
+    echo "error: trace mode must be full, device, or host" >&2
     exit 2
 fi
 if [[ -e "$OUT_DIR" ]]; then
@@ -46,12 +46,16 @@ else
 fi
 
 "$AMD_SMI" metric -g "$PHYSICAL_GPU" -u -p -c -t --json >"$OUT_DIR/sensor-before.json" 2>"$OUT_DIR/sensor-before.stderr" || true
-TRACE_ARGS=(--kernel-trace --memory-copy-trace --marker-trace --stats)
+TRACE_ARGS=(--marker-trace --stats)
 ANALYZE_ARGS=()
 if [[ "$TRACE_MODE" == full ]]; then
-    TRACE_ARGS+=(--hip-runtime-trace)
-else
+    TRACE_ARGS+=(--hip-runtime-trace --kernel-trace --memory-copy-trace)
+elif [[ "$TRACE_MODE" == device ]]; then
+    TRACE_ARGS+=(--kernel-trace --memory-copy-trace)
     ANALYZE_ARGS+=(--device-only)
+else
+    TRACE_ARGS+=(--hip-runtime-trace)
+    ANALYZE_ARGS+=(--host-only)
 fi
 "$PROFILER" "${TRACE_ARGS[@]}" \
     --output-format csv --output-directory "$OUT_DIR/rocprof" --output-file timeline -- \

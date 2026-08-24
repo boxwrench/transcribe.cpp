@@ -121,6 +121,7 @@ paths, and checksums stay consistent.
 ## Evidence layout
 
 - `OBJECTIVES.md` freezes priorities, metrics, and correctness gates.
+- `STOPPING-POLICY.md` defines the fat-curve continuation and stopping rules.
 - `manifests/` records model hashes, workload, devices, waves, and shapes.
 - `baselines/` and `profiles/` contain curated summaries.
 - `leads/` ranks observed opportunities without assuming their mechanism.
@@ -184,8 +185,8 @@ because this machine contains no NVIDIA device or CUDA toolkit; see
 [`DEC-0002`](decisions/DEC-0002-native-cuda-validation.md).
 
 LEAD-0006 separately preserves the deterministic long-stream RNNT numerical
-divergence exposed by EXP-0003. It is important correctness evidence, but stays
-deferred until the primary LEAD-0005 execution-system investigation closes.
+divergence exposed by EXP-0003. It remains parked unless the broader quality
+sweep exposes additional cross-GPU divergence.
 
 LEAD-0005 measurement attempt 1 reconciled every captured request but found
 that rocprofiler kernel tracing reverses known graph-enabled production
@@ -200,6 +201,22 @@ open for a lower-overhead in-process measurement. See
 intervention intended to test a mechanism. Accordingly, `EXP-0004` is
 unassigned. It will not be created until LEAD-0005 produces a
 production-admissible mechanism and a falsifiable intervention.
+
+Attempt 2 used HIP-runtime-only tracing and stayed within 3.15%/2.50% of
+matched unprofiled latency. gfx1201 spent 136.16 ms/request longer inside the
+same 13,826 `hipStreamSynchronize` calls, accounting for 88.61% of the traced
+gap. Graph create/update/launch and frontend work were effectively equal.
+LEAD-0005 is therefore `QUALIFIED_HOLD_DEVICE_COMPLETION_WAIT`: it found where
+the host observes the loss, but no safe low-cost runtime intervention. See
+[`ATTEMPT-2`](investigations/LEAD-0005/ATTEMPT-2.md).
+
+The fresh post-EXP-0003 profile confirms that all 10,080 affine-LayerNorm
+triplets are gone. No remaining pure elementwise/layout chain clears a 3%
+impossible-elimination ceiling on both GPUs. FFN production-shape chains now
+rank first (11–12% family ceiling), followed by convolution (about 7% on both)
+and attention (5–8%). These are leads only; `EXP-0004` remains unassigned until
+one has a specific mechanism and falsifiable intervention. See the
+[`post-fusion profile`](phase-map/POST-EXP-0003.md).
 
 No optimization is promoted from a microbenchmark alone. Complete served
 streaming requests and the frozen quality panel remain the final gates.

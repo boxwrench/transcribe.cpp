@@ -21,6 +21,13 @@ def trace_file(root: Path, suffix: str) -> Path:
     return matches[0]
 
 
+def optional_trace_file(root: Path, suffix: str) -> Path | None:
+    matches = list(root.rglob(f"*_{suffix}.csv"))
+    if len(matches) > 1:
+        raise RuntimeError(f"expected at most one *_{suffix}.csv under {root}, found {len(matches)}")
+    return matches[0] if matches else None
+
+
 def read_rows(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as source:
         return list(csv.DictReader(source))
@@ -85,13 +92,18 @@ def main() -> None:
     parser.add_argument("--target", required=True)
     parser.add_argument("--condition", required=True)
     parser.add_argument("--device-only", action="store_true")
+    parser.add_argument("--host-only", action="store_true")
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
 
     markers = read_rows(trace_file(args.trace_root, "marker_api_trace"))
+    if args.device_only and args.host_only:
+        parser.error("--device-only and --host-only are mutually exclusive")
     hip_rows = [] if args.device_only else read_rows(trace_file(args.trace_root, "hip_api_trace"))
-    kernel_rows = read_rows(trace_file(args.trace_root, "kernel_trace"))
-    copy_rows = read_rows(trace_file(args.trace_root, "memory_copy_trace"))
+    kernel_path = optional_trace_file(args.trace_root, "kernel_trace")
+    copy_path = optional_trace_file(args.trace_root, "memory_copy_trace")
+    kernel_rows = [] if args.host_only or kernel_path is None else read_rows(kernel_path)
+    copy_rows = [] if args.host_only or copy_path is None else read_rows(copy_path)
     bench = json.loads(args.bench_json.read_text(encoding="utf-8"))
 
     requests: list[tuple[int, Interval]] = []
@@ -233,7 +245,8 @@ def main() -> None:
         "classification": "DIAGNOSTIC_MEASUREMENT_NOT_EXPERIMENT",
         "target": args.target, "condition": args.condition, "requests": results,
         "median": {name: med(path) for name, path in median_paths.items()},
-        "admissibility": "Requires a matched uninstrumented latency control; Attempt 1 failed this gate for graph-enabled traces.",
+        "trace_scope": "host_only" if args.host_only else "device_only" if args.device_only else "full",
+        "admissibility": "Requires a matched uninstrumented latency control; Attempt 1 failed this gate for graph-enabled kernel traces.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
