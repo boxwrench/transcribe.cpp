@@ -1,0 +1,14 @@
+{
+  "schema": "amd-nemotron-experiment-result-v1",
+  "experiment_id": "EXP-0001",
+  "decision": "HOLD",
+  "evidence_class": "U",
+  "correctness": "PASS",
+  "measurements": {
+    "gfx1100": {"graph_enabled_mean_ms":1357.929,"graph_disabled_mean_ms":1489.143,"disabled_delta_percent":9.663,"graph_enabled_p95_ms":1429.028,"graph_disabled_p95_ms":2043.175},
+    "gfx1201": {"graph_enabled_mean_ms":1432.711,"graph_disabled_mean_ms":1589.084,"disabled_delta_percent":10.914,"graph_enabled_p95_ms":4547.257,"graph_disabled_p95_ms":2058.233}
+  },
+  "confounder": "An unrelated vLLM process started during the run on physical GPU 1, used 15-20 GB R9700 VRAM and 32-44% GPU activity, and enabled 56 GB CPU offload. It coincided with gfx1100-disabled spikes and the first two gfx1201-enabled requests.",
+  "interpretation": "Both point estimates favor graphs, but the paired timing result is invalid for causal promotion. Exact transcript and token IDs match in all four arms.",
+  "next_action": "Rerun the unchanged frozen protocol only when both target GPUs and host CPU are idle; randomize or interleave arm order in a successor protocol if background-load control is available."
+}

@@ -1,0 +1,19 @@
+{
+  "run_id": "20260823T235407Z-and-20260823T235716Z",
+  "model_sha256": "b94545b313b3223fda7b2857a52681da813935c2127643d1e9ff0c23d988089c",
+  "runtime_commit": "ea077b87590bcfb090d7c38c03ab36cd1c7005d3",
+  "backend": "rocm",
+  "device": "gfx1100 and gfx1201, isolated logical device 0",
+  "measurement_context": {"audio":"jfk.wav","feed_ms":80,"stream_att_right":3,"encoder_layers":24,"d_model":1024,"d_ff":4096,"heads":8,"head_dim":128,"conv_kernel":9,"subsampling":8,"predictor_hidden":640,"vocab":13088},
+  "operations": [
+    {"phase":"frontend","operation_family":"log-mel frontend","tensor_family":"PCM to 128-bin mel","shape":[128],"dtype":"f32","frequency_per_feed":1.0,"stream_att_right":3,"dispatch":"host frontend","kernel":null,"placement":"CPU","fallback":false},
+    {"phase":"subsampling","operation_family":"causal convolution subsampling plus projection","tensor_family":"3x3 conv stack and [4352,1024] projection","shape":[4352,1024],"dtype":"Q8_0 projection weights","frequency_per_feed":0.5,"stream_att_right":3,"dispatch":"ggml ROCm","kernel":"mul_mat_vec_q plus convolution kernels","placement":"GPU","fallback":false},
+    {"phase":"ffn","operation_family":"Macaron FFN projections","tensor_family":"48 [1024,4096] and 48 [4096,1024] weights","shape":[1024,4096],"dtype":"Q8_0 weights / Q8_1 activations","frequency_per_feed":48.0,"stream_att_right":3,"dispatch":"ggml ROCm quantized matvec","kernel":"mul_mat_vec_q<GGML_TYPE_Q8_0,2,...>","placement":"GPU","fallback":false},
+    {"phase":"attention","operation_family":"relative-position attention projections","tensor_family":"120 [1024,1024] Q/K/V/out/pos weights","shape":[1024,1024],"dtype":"Q8_0 weights / Q8_1 activations","frequency_per_feed":60.0,"stream_att_right":3,"dispatch":"ggml ROCm quantized matvec and attention ops","kernel":"mul_mat_vec_q<GGML_TYPE_Q8_0,2,...>","placement":"GPU","fallback":false},
+    {"phase":"convolution","operation_family":"pointwise GLU, causal depthwise, pointwise projection","tensor_family":"[1,1024,2048], [9,1,1024], [1,1024,1024] per layer","shape":[9,1,1024],"dtype":"f16 pointwise / f32 depthwise","frequency_per_feed":12.0,"stream_att_right":3,"dispatch":"direct pointwise matvec and depthwise conv","kernel":"mul_mat_vec_f<half,...> plus depthwise convolution","placement":"GPU","fallback":false},
+    {"phase":"cache","operation_family":"channel/time/K/V cache update","tensor_family":"constant-memory per-layer streaming state","shape":[1024,56],"dtype":"f32","frequency_per_feed":12.0,"stream_att_right":3,"dispatch":"concat/copy/update in ggml graph","kernel":"concat_cont and cpy_scalar families","placement":"GPU with persistent host-owned state","fallback":false},
+    {"phase":"rnnt_predictor","operation_family":"two-layer LSTM predictor","tensor_family":"four [640,2560] Q8_0 matrices","shape":[640,2560],"dtype":"Q8_0 weights / f32 state","frequency_per_feed":0.27,"stream_att_right":3,"dispatch":"thread-parallel host predictor","kernel":null,"placement":"CPU","fallback":false},
+    {"phase":"rnnt_joint","operation_family":"encoder/predictor joint and 13k output projection","tensor_family":"[1024,640], [640,640], [640,13088]","shape":[640,13088],"dtype":"Q8_0 weights","frequency_per_feed":1.0,"stream_att_right":3,"dispatch":"reused ggml joint graph","kernel":"mul_mat_vec_q<GGML_TYPE_Q8_0,2,...>","placement":"GPU","fallback":false},
+    {"phase":"postprocess","operation_family":"greedy token commit and timestamps","tensor_family":"host token stream","shape":[37],"dtype":"host token state","frequency_per_feed":0.27,"stream_att_right":3,"dispatch":"host","kernel":null,"placement":"CPU","fallback":false}
+  ]
+}

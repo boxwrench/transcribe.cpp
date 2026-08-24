@@ -48,6 +48,20 @@ __pycache__/
 # Local model artifacts (converter output, etc).
 /models/
 
+# AMD Nemotron campaign outputs. Raw data is immutable locally; only its
+# manifests, hashes, protocols, and curated summaries are versioned.
+/research/amd-nemotron/runs/*
+!/research/amd-nemotron/runs/README.md
+/research/amd-nemotron/telemetry/*
+!/research/amd-nemotron/telemetry/README.md
+/research/amd-nemotron/profiles/*
+!/research/amd-nemotron/profiles/README.md
+!/research/amd-nemotron/profiles/profile-summary.md
+/research/amd-nemotron/baselines/*
+!/research/amd-nemotron/baselines/README.md
+!/research/amd-nemotron/baselines/baseline-summary.csv
+!/research/amd-nemotron/baselines/baseline-summary.md
+
 # Local-only fetched golden assets (kept out of git - they
 # should be fetchable, not assumed present in every contributor environment)
 /tests/golden/**/*.f32

@@ -1,0 +1,8 @@
+{
+  "system_manifest": "research/amd-nemotron/runs/20260823T233653Z-system",
+  "device_map": "research/amd-nemotron/manifests/system/device-map.json",
+  "rocm": "7.2.1",
+  "profiler": "rocprofiler-sdk 1.1.0",
+  "kernel": "6.17.0-14-generic",
+  "note": "Exact package, firmware, compiler, and GPU reports are checksummed in the referenced local immutable system manifest."
+}

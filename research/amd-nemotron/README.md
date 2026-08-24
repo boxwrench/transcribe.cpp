@@ -1,0 +1,131 @@
+# AMD Nemotron streaming optimization on Linux
+
+This campaign establishes a reproducible AMD/Linux baseline for NVIDIA's two
+0.6B cache-aware Nemotron ASR models in `transcribe.cpp`:
+
+- `nemotron-speech-streaming-en-0.6b`;
+- `nemotron-3.5-asr-streaming-0.6b`.
+
+The measured targets are a Radeon RX 7900 XT (`gfx1100`) and Radeon AI PRO
+R9700 (`gfx1201`) using CPU/OpenBLAS, Vulkan/RADV, and ROCm 7.2.1 HIP builds.
+Milestone 1 covers correctness, controlled Q8_0 baselines, route and shape
+proof, ROCm profiling, ranked leads, and one frozen experiment. It deliberately
+does not claim that an AMD kernel optimization has already been promoted.
+
+## Results
+
+Every accelerated route produced byte-identical transcripts to its CPU
+reference for `jfk.wav`, `dots.wav`, and `noise.wav`. Each build also passes
+all 37 project tests.
+
+The trained low-lookahead `jfk.wav` results use 30 measured requests after two
+warmups:
+
+| Route | English mean / p95 | Multilingual mean / p95 |
+| --- | ---: | ---: |
+| CPU + BLAS | 2307 / 2417 ms | 1305 / 1362 ms |
+| Vulkan gfx1100 | 939 / 981 ms | **527 / 554 ms** |
+| Vulkan gfx1201 | 1230 / 1366 ms | 688 / 714 ms |
+| HIP gfx1100 | **782 / 840 ms** | 581 / 751 ms |
+| HIP gfx1201 | 930 / 953 ms | 542 / 588 ms |
+
+HIP is the best initial English route on both GPUs. Vulkan is the best initial
+multilingual route and avoids the HIP gfx1100 tail. All measured feed p99
+latencies remain below the 80 ms input cadence. See
+[`baselines/baseline-summary.md`](baselines/baseline-summary.md) and the
+machine-readable [`baseline-summary.csv`](baselines/baseline-summary.csv).
+
+ROCm profiling attributes more than 70% of GPU time to named kernel families.
+Q8_0 matrix-vector work is largest at 20.95% on gfx1100 and 34.39% on gfx1201.
+The main contradiction is that gfx1201 has less aggregate traced kernel time
+but higher served request time. Graph launch and synchronization behavior is
+therefore the first cheap falsification target; skinny Q8 matvec remains the
+second-ranked engineering target. Details are in
+[`profiles/profile-summary.md`](profiles/profile-summary.md).
+
+## Important HIP device rule
+
+Use one physical HIP GPU at a time and select logical device 0:
+
+```bash
+HIP_VISIBLE_DEVICES=0 build/hip-gfx1100/bin/transcribe-cli --backend rocm --device 0 ...
+HIP_VISIBLE_DEVICES=1 build/hip-gfx1201/bin/transcribe-cli --backend rocm --device 0 ...
+```
+
+The gfx1201 binary crashes in the HIP graph path when it selects physical
+ordinal 1 while the mixed `gfx1100`/`gfx1201`/integrated registry is visible.
+Graph-enabled offline and streaming runs are stable when the R9700 is isolated.
+Disabling graphs did not reliably fix the mixed-device case. The evidence and
+qualification are recorded in [`DEC-0001`](decisions/DEC-0001-hip-device-isolation.md).
+
+## Reproduce the campaign
+
+Install a C++ toolchain, CMake/Ninja, Vulkan development tools, ROCm 7.2.1,
+OpenBLAS, `jq`, `uv`, and `hf`. ROCm profiling additionally needs
+`rocprofiler-sdk` and `hsa-amd-aqlprofile`.
+
+From the repository root:
+
+```bash
+research/amd-nemotron/scripts/capture-system.sh
+research/amd-nemotron/scripts/build-all.sh
+research/amd-nemotron/scripts/download-models.sh
+research/amd-nemotron/scripts/list-devices.sh
+research/amd-nemotron/scripts/run-correctness-matrix.sh
+research/amd-nemotron/scripts/run-baseline-matrix.sh
+```
+
+Collect representative HIP traces with:
+
+```bash
+HIP_VISIBLE_DEVICES=0 research/amd-nemotron/scripts/run-profile.sh \
+  hip-gfx1100 nemotron-speech-streaming-en-0.6b en 0
+HIP_VISIBLE_DEVICES=1 research/amd-nemotron/scripts/run-profile.sh \
+  hip-gfx1201 nemotron-speech-streaming-en-0.6b en 0
+```
+
+GPU commands require access to `/dev/kfd` and `/dev/dri`. The model manifest
+pins exact filenames, sizes, and SHA-256 hashes. The device map pins PCI and
+logical-device identities. Raw campaign runs are intentionally ignored because
+they are large; tracked summaries, protocols, decisions, and hashes are the
+reviewable evidence layer.
+
+## Benchmark tool
+
+`transcribe-stream-bench` is a backend-neutral served-stream benchmark added by
+this campaign. It reports raw timing for every feed and per-request summaries
+for:
+
+- feed mean, p50, p95, p99, and maximum;
+- first-result compute latency;
+- complete request and finalization latency;
+- internal mel, encoder, and decoder time;
+- final transcript and token IDs.
+
+Example:
+
+```bash
+build/hip-gfx1100/bin/transcribe-stream-bench \
+  --model models/nemotron-speech-streaming-en-0.6b/nemotron-speech-streaming-en-0.6b-Q8_0.gguf \
+  --sample samples/jfk.wav --backend rocm --device 0 --language en \
+  --feed-ms 80 --att-right 1 --warmup 2 --iters 30 --json-out result.json
+```
+
+## Evidence layout
+
+- `OBJECTIVES.md` freezes priorities, metrics, and correctness gates.
+- `manifests/` records model hashes, workload, devices, waves, and shapes.
+- `baselines/` and `profiles/` contain curated summaries.
+- `leads/` ranks observed opportunities without assuming their mechanism.
+- `experiments/EXP-0001/` contains the frozen graph A/B protocol and raw data.
+- `decisions/` records qualifications that affect valid measurements.
+- `ledger.jsonl` is the append-only campaign decision log.
+
+EXP-0001 is `HOLD`, not a performance conclusion. An unrelated vLLM workload
+started during its graph-enabled/disabled A/B and contaminated both GPU and
+CPU-offload timing. Exact transcript/token correctness passed, and the raw
+evidence is retained with checksums. Rerun the unchanged protocol on an idle
+machine before changing graph or kernel code.
+
+No optimization is promoted from a microbenchmark alone. Complete served
+streaming requests and the frozen quality panel remain the final gates.

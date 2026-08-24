@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AMD Nemotron streaming shape manifest",
+  "type": "object",
+  "required": ["run_id", "model_sha256", "runtime_commit", "backend", "device", "operations"],
+  "properties": {
+    "run_id": {"type": "string"},
+    "model_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "runtime_commit": {"type": "string"},
+    "backend": {"enum": ["cpu", "vulkan", "rocm"]},
+    "device": {"type": "string"},
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["phase", "operation_family", "dtype", "frequency_per_feed", "dispatch", "fallback"],
+        "properties": {
+          "phase": {"enum": ["frontend", "subsampling", "encoder", "attention", "convolution", "ffn", "cache", "rnnt_predictor", "rnnt_joint", "postprocess"]},
+          "operation_family": {"type": "string"},
+          "tensor_family": {"type": "string"},
+          "m": {"type": ["integer", "null"]},
+          "n": {"type": ["integer", "null"]},
+          "k": {"type": ["integer", "null"]},
+          "shape": {"type": "array", "items": {"type": "integer"}},
+          "dtype": {"type": "string"},
+          "frequency_per_feed": {"type": "number"},
+          "stream_att_right": {"type": "integer"},
+          "dispatch": {"type": "string"},
+          "kernel": {"type": ["string", "null"]},
+          "placement": {"type": "string"},
+          "fallback": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

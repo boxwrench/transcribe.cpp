@@ -1,0 +1,11 @@
+target,device,model,backend,att_right,request_mean_ms,request_p95_ms,chunk_p99_ms,first_result_p95_ms,finalize_p95_ms,correctness
+cpu,-1,english,CPU,1,2307.297,2416.698,64.230,234.011,53.041,pass
+cpu,-1,multilingual,CPU,3,1304.821,1362.233,47.580,180.109,51.571,pass
+vulkan,0,english,Vulkan0,1,938.901,980.858,16.364,87.112,16.175,pass
+vulkan,0,multilingual,Vulkan0,3,526.925,553.998,17.860,62.509,20.896,pass
+vulkan,1,english,Vulkan1,1,1230.246,1366.122,22.936,115.932,23.595,pass
+vulkan,1,multilingual,Vulkan1,3,688.330,713.613,21.330,83.402,22.730,pass
+hip-gfx1100,0,english,ROCm0,1,782.376,840.286,14.256,80.378,14.498,pass
+hip-gfx1100,0,multilingual,ROCm0,3,580.613,751.383,32.709,118.336,37.832,pass
+hip-gfx1201,0,english,ROCm0,1,929.738,952.628,17.602,96.277,20.988,pass
+hip-gfx1201,0,multilingual,ROCm0,3,541.579,587.740,21.687,95.249,26.736,pass

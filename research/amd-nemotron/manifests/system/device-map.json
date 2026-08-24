@@ -1,0 +1,12 @@
+{
+  "schema": "amd-nemotron-device-map-v1",
+  "status": "resolved",
+  "evidence": "research/amd-nemotron/runs/20260823T232910Z-devices",
+  "instructions": "Indices are scoped to the matching build and visibility environment. Re-resolve them after backend/runtime changes. HIP runs isolate one physical GPU at a time because selecting the gfx1201 ordinal while mixed architectures are visible crashes in the ROCm graph path.",
+  "devices": {
+    "vulkan-gfx1100": {"build": "vulkan", "index": 0, "pci": "0000:03:00.0"},
+    "vulkan-gfx1201": {"build": "vulkan", "index": 1, "pci": "0000:06:00.0"},
+    "rocm-gfx1100": {"build": "hip-gfx1100", "index": 0, "pci": "0000:03:00.0", "environment": {"HIP_VISIBLE_DEVICES": "0"}},
+    "rocm-gfx1201": {"build": "hip-gfx1201", "index": 0, "pci": "0000:06:00.0", "environment": {"HIP_VISIBLE_DEVICES": "1"}}
+  }
+}

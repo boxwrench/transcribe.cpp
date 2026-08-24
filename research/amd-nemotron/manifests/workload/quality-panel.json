@@ -1,0 +1,15 @@
+{
+  "schema": "amd-nemotron-workload-panel-v1",
+  "frozen": true,
+  "stream_feed_ms": 80,
+  "samples": [
+    {"id": "short-clean", "path": "samples/jfk.wav", "required": true},
+    {"id": "long-included", "path": "samples/dots.wav", "required": true},
+    {"id": "clean-conversation", "path": null, "required_before_promotion": true},
+    {"id": "noisy", "path": "samples/noise.wav", "required": true},
+    {"id": "continuous-2-to-5-minute", "path": null, "required_before_promotion": true},
+    {"id": "multilingual", "path": "samples/german.wav", "language": "de-DE", "required": true}
+  ],
+  "ordinary_runs": {"warmup": 2, "measured": 10},
+  "tail_runs": {"warmup": 2, "measured_minimum": 30}
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "amd-nemotron-wave-v1",
+  "wave_id": "WAVE-0001",
+  "runtime_baseline_commit": "ea077b87590bcfb090d7c38c03ab36cd1c7005d3",
+  "runtime_baseline_tag": "amd-nemotron-baseline-0",
+  "quant": "Q8_0",
+  "targets": ["gfx1100", "gfx1201"],
+  "status": "milestone-1-complete",
+  "promotion_requires": [
+    "quality panel passes",
+    "matched CPU/Vulkan/HIP data",
+    "route and fallback proof",
+    "phase and shape budget",
+    "ranked leads",
+    "frozen experiment protocol"
+  ]
+}

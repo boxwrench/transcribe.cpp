@@ -1,0 +1,21 @@
+{
+  "lead_id": "LEAD-0001",
+  "source": "contradiction",
+  "observation": "The gfx1201 HIP streaming route segfaults when the gfx1201 build selects physical device ordinal 1 with mixed GPU architectures visible, but succeeds with graph capture enabled when the R9700 is isolated as logical device 0.",
+  "evidence": [
+    "research/amd-nemotron/runs/20260823T233017Z-correctness-hip-gfx1201-nemotron-speech-streaming-en-0.6b/jfk.stderr",
+    "gdb: ggml_cuda_graph_evaluate_and_capture -> ggml_cuda_op_fill -> libamdhip64.so.7",
+    "repeated GGML_CUDA_DISABLE_GRAPHS=1 runs did not eliminate the crash",
+    "matched offline and streaming runs with HIP_VISIBLE_DEVICES=1 and --device 0 exited successfully; streaming logs include graph warmup completion"
+  ],
+  "affected_phase_shapes": ["streaming graph capture", "fill operation", "gfx1201"],
+  "wall_clock_share": null,
+  "amdahl_ceiling": "Correctness blocker; performance ceiling is not yet meaningful.",
+  "suspected_mechanism": "ROCm 7.2.1 or the ggml HIP backend mishandles device ordinals/state when a single-architecture gfx1201 binary sees a mixed-architecture device registry.",
+  "cheapest_falsifier": "Repeat the same graph-enabled command with all devices visible at ordinal 1 and with HIP_VISIBLE_DEVICES=1 at ordinal 0.",
+  "correctness_risk": "critical",
+  "implementation_cost": "P0 configuration workaround; P2 root-cause fix",
+  "priority": "P0",
+  "status": "QUALIFY",
+  "qualified_configuration": {"target": "gfx1201", "HIP_VISIBLE_DEVICES": "1", "device": 0}
+}

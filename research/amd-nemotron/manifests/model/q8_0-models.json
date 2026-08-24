@@ -1,0 +1,20 @@
+{
+  "schema": "amd-nemotron-model-set-v1",
+  "weights_committed_to_git": false,
+  "models": [
+    {
+      "variant": "nemotron-speech-streaming-en-0.6b",
+      "repo": "handy-computer/nemotron-speech-streaming-en-0.6b-gguf",
+      "filename": "nemotron-speech-streaming-en-0.6b-Q8_0.gguf",
+      "language": "en",
+      "stream_att_right": [0, 1, 6, 13]
+    },
+    {
+      "variant": "nemotron-3.5-asr-streaming-0.6b",
+      "repo": "handy-computer/nemotron-3.5-asr-streaming-0.6b-gguf",
+      "filename": "nemotron-3.5-asr-streaming-0.6b-Q8_0.gguf",
+      "language": "en-US",
+      "stream_att_right": [0, 3, 6, 13]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "lead_id": "LEAD-0002",
+  "source": "contradiction",
+  "observation": "gfx1201 completes 14.7% less aggregate traced kernel time than gfx1100 but takes 18.8% more unprofiled English request wall time; graph launch and stream synchronization dominate traced HIP API duration.",
+  "evidence": ["research/amd-nemotron/profiles/profile-summary.md", "research/amd-nemotron/baselines/baseline-summary.csv"],
+  "affected_phase_shapes": ["repetitive small streaming graphs", "138 feed calls", "24-layer encoder"],
+  "wall_clock_share": "unassigned gap between faster aggregate kernels and slower served wall time; HIP API trace is 68.98-73.12% graph launch plus 13.63-14.38% stream synchronize, inclusive and overlapping",
+  "amdahl_ceiling": "up to the 147 ms gfx1201-vs-gfx1100 English request gap; must be established causally",
+  "suspected_mechanism": "graph construction/replay, synchronization, or launch scheduling costs are architecture-sensitive for the many narrow streaming dispatches",
+  "cheapest_falsifier": "matched graph-enabled versus GGML_CUDA_DISABLE_GRAPHS=1 served benchmark on each isolated GPU",
+  "correctness_risk": "low",
+  "implementation_cost": "P1 configuration experiment",
+  "priority": "P1",
+  "status": "SELECTED_EXP-0001-HOLD-ENVIRONMENT-CONTAMINATION"
+}
