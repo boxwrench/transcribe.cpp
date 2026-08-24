@@ -84,5 +84,5 @@
     "gfx1201": "37/37 passed",
     "qualification": "one initial parallel utf8_path_unit collision shared the same /tmp path; isolated rerun passed"
   },
-  "next_action": "Promote affine LayerNorm fusion by default and freeze a diagnostic experiment for LEAD-0005 gfx1201 non-kernel/graph/dispatch overhead."
+  "next_action": "Promote affine LayerNorm fusion by default and perform a measurement-only LEAD-0005 investigation of gfx1201 non-kernel/graph/dispatch overhead; assign no EXP number until a mechanism and intervention are frozen."
 }

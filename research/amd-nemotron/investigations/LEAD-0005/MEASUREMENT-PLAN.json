@@ -1,0 +1,47 @@
+{
+  "schema": "amd-nemotron-lead-investigation-v1",
+  "lead_id": "LEAD-0005",
+  "classification": "DIAGNOSTIC_MEASUREMENT_NOT_EXPERIMENT",
+  "state": "PRIMARY_ATTEMPT_1_HELD_OBSERVER_EFFECT",
+  "runtime_commit": "22dbe1c85a299976388ee1ec6b2d4cc7c9da1220",
+  "question": "If graph-disabled summed GPU compute is approximately equal on gfx1100 and gfx1201, where does the additional gfx1201 graph-enabled served-request time actually go?",
+  "scope_rule": "No optimization work and no EXP number during LEAD-0005. An experiment may be frozen only after this investigation identifies a mechanism and a falsifiable intervention.",
+  "model": "nemotron-speech-streaming-en-0.6b-Q8_0",
+  "model_sha256": "90d8c89714cd31efc88be62a40c6b2bea57e0cc2063af1ffe2c28f1a228ca110",
+  "workload": {"audio":"samples/jfk.wav","feed_ms":80,"att_right":1,"warmup":2,"measured_iterations":3},
+  "targets": [
+    {"architecture":"gfx1100","build":"build/lead0005-gfx1100","environment":{"HIP_VISIBLE_DEVICES":"0"},"device":0},
+    {"architecture":"gfx1201","build":"build/lead0005-gfx1201","environment":{"HIP_VISIBLE_DEVICES":"1"},"device":0}
+  ],
+  "primary_condition": "same graph-enabled production request on each isolated GPU",
+  "diagnostic_control": "GGML_CUDA_DISABLE_GRAPHS=1",
+  "request_scope": "Each measured stream is delimited after two warmups; initialization and teardown are excluded.",
+  "required_time_buckets": [
+    "T_request", "T_GPU_busy", "T_GPU_idle", "T_HIP_API",
+    "T_graph_create", "T_graph_update", "T_graph_launch", "T_memcpy",
+    "T_sync_wait", "T_CPU_frontend", "T_CPU_RNNT_decode", "T_other"
+  ],
+  "required_counts_and_ratios": [
+    "kernel_count", "graph_launch_count", "HIP_API_call_count",
+    "sync_count", "event_count", "H2D_bytes", "D2H_bytes",
+    "graph_update_frequency", "graph_instantiate_frequency",
+    "mean_inter_kernel_gap", "p95_inter_kernel_gap",
+    "GPU_busy_fraction", "CPU_blocked_waiting_fraction"
+  ],
+  "definitions": {
+    "T_GPU_busy": "union of request-clipped kernel and device-copy intervals",
+    "T_GPU_idle": "T_request minus T_GPU_busy; also report idle within first-to-last GPU submission",
+    "T_HIP_API": "union and inclusive duration of request-clipped HIP runtime calls",
+    "T_graph_create_update_launch": "separate union durations and call counts for create/instantiate, update, and launch",
+    "T_memcpy": "device-copy interval union; separately report HIP memcpy API duration, direction counts, and H2D/D2H bytes",
+    "T_sync_wait": "union of host synchronize/wait calls",
+    "T_CPU_frontend_and_decode": "request-scoped timestamp spans, not duration-only counters",
+    "T_other": "unclaimed request wall time after mutually exclusive interval attribution",
+    "inter_kernel_gap": "positive gap between adjacent merged request-clipped kernel intervals",
+    "CPU_blocked_waiting_fraction": "union of request-clipped host synchronize/wait spans divided by T_request"
+  },
+  "reconciliation": "For every request, T_request = mutually exclusive attributable execution time + T_other + residual. Residual must be <= max(1 ms, 0.5% of T_request), and all overlapping inclusive metrics must remain diagnostic rather than additive.",
+  "admissibility_gate": "Instrumentation must preserve the direction of the uninstrumented graph-enabled cross-target result and stay within 5% latency per target, or its affected buckets are inadmissible for causal attribution.",
+  "causal_output_gate": "Conclude with a named +X ms/request mechanism only when it is stable across requests, reconciles, survives the observer-effect gate, and explains at least 50% of the cross-target residual. Otherwise HOLD and refine measurement.",
+  "evidence_class_goal": "C"
+}

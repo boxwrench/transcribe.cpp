@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -lt 5 || $# -gt 6 ]]; then
-    echo "usage: $0 exp0004-gfx1100|exp0004-gfx1201 PHYSICAL_GPU TARGET enabled|disabled OUTPUT_DIR [full|device]" >&2
+    echo "usage: $0 BUILD_NAME PHYSICAL_GPU TARGET enabled|disabled OUTPUT_DIR [full|device]" >&2
     exit 2
 fi
 

@@ -1,0 +1,79 @@
+{
+  "schema": "amd-nemotron-lead-measurement-attempt-v1",
+  "lead_id": "LEAD-0005",
+  "classification": "DIAGNOSTIC_MEASUREMENT_NOT_EXPERIMENT",
+  "attempt": 1,
+  "decision": "HOLD_PROFILER_OBSERVER_EFFECT",
+  "captures": {
+    "gfx1100_graphs_disabled": {
+      "request_median_ms": 1358.853157,
+      "gpu_busy_union_median_ms": 355.060506,
+      "gpu_nonbusy_median_ms": 986.873612,
+      "gpu_busy_over_request_median": 0.2661842412,
+      "kernel_count_median": 115180,
+      "hip_api_call_count_median": 333178,
+      "sync_wait_count_median": 13826,
+      "mean_inter_kernel_gap_ms_median": 0.0085621816,
+      "p95_inter_kernel_gap_ms_median": 0.022731,
+      "cpu_blocked_over_request_median": 0.2501254711,
+      "critical_path_median_ms": {"sync":259.562752,"dispatch_memcpy_api":263.215600,"non_hip_host":449.683649}
+    },
+    "gfx1201_graphs_disabled": {
+      "request_median_ms": 1460.757484,
+      "gpu_busy_union_median_ms": 395.890129,
+      "gpu_nonbusy_median_ms": 1064.867355,
+      "gpu_busy_over_request_median": 0.2710170123,
+      "kernel_count_median": 114970,
+      "hip_api_call_count_median": 334372,
+      "sync_wait_count_median": 13826,
+      "mean_inter_kernel_gap_ms_median": 0.0092572994,
+      "p95_inter_kernel_gap_ms_median": 0.026441,
+      "cpu_blocked_over_request_median": 0.2536655338,
+      "critical_path_median_ms": {"sync":285.285026,"dispatch_memcpy_api":298.491586,"non_hip_host":474.279576}
+    },
+    "gfx1100_graphs_enabled": {
+      "request_median_ms": 3375.628204,
+      "gpu_busy_union_median_ms": 526.205119,
+      "gpu_nonbusy_median_ms": 2828.945729,
+      "gpu_busy_over_request_median": 0.1607575136,
+      "kernel_count_median": 115180,
+      "hip_api_call_count_median": 47664,
+      "graph_launch_count_median": 1700,
+      "graph_instantiate_count_median": 26,
+      "graph_update_count_median": 50,
+      "sync_wait_count_median": 13826,
+      "mean_inter_kernel_gap_ms_median": 0.0245531795,
+      "p95_inter_kernel_gap_ms_median": 0.039810,
+      "cpu_blocked_over_request_median": 0.2800132020
+    },
+    "gfx1201_graphs_enabled": {
+      "request_median_ms": 2987.510421,
+      "gpu_busy_union_median_ms": 410.097829,
+      "gpu_nonbusy_median_ms": 2577.412592,
+      "gpu_busy_over_request_median": 0.1372707610,
+      "kernel_count_median": 114970,
+      "hip_api_call_count_median": 47959,
+      "graph_launch_count_median": 1677,
+      "graph_instantiate_count_median": 25,
+      "graph_update_count_median": 25,
+      "sync_wait_count_median": 13826,
+      "mean_inter_kernel_gap_ms_median": 0.0224081723,
+      "p95_inter_kernel_gap_ms_median": 0.036441,
+      "cpu_blocked_over_request_median": 0.2266568884
+    }
+  },
+  "reconciliation": "Every individual request reconciles exactly in device, host, and priority-based critical-path views.",
+  "observer_effect": {
+    "expected_from_unprofiled_EXP_0001": "graphs enabled are faster on both targets",
+    "observed_with_full_trace": "graphs enabled are 148% slower than disabled on gfx1100 and 105% slower on gfx1201; gfx1201 also becomes faster than gfx1100",
+    "device_only_falsifier": "removing HIP API tracing left gfx1100 graph-enabled median at 3371.056 ms versus 3375.628 ms with full tracing",
+    "conclusion": "kernel-dispatch tracing itself materially serializes or delays HIP graph execution; graph-enabled trace buckets are not representative of production"
+  },
+  "qualified_graph_disabled_signal": "With graphs disabled, profiling preserves the production direction: gfx1201 request median is 101.90 ms higher, GPU-busy union is 40.83 ms higher, and GPU-nonbusy median is 77.99 ms higher. Because these are medians of separate captures they are diagnostic, not an additive causal decomposition.",
+  "required_metric_coverage": {
+    "available_from_attempt_1": ["T_request", "T_GPU_busy", "T_GPU_idle", "T_HIP_API", "T_memcpy_duration", "T_sync_wait", "kernel_count", "graph_launch_count", "HIP_API_call_count", "sync_event_count", "mean_inter_kernel_gap", "p95_inter_kernel_gap", "GPU_busy_fraction", "CPU_blocked_waiting_fraction"],
+    "missing_or_inadmissible": ["production-admissible graph timing", "H2D_bytes", "D2H_bytes", "request-scoped CPU_frontend", "request-scoped CPU_RNNT_decode", "production-admissible graph update and instantiate frequency"]
+  },
+  "next_action": "Replace graph-enabled rocprofiler timelines with low-overhead in-process graph/API/stage timing plus transfer-byte counters, and validate observer overhead against uninstrumented latency before naming a mechanism or freezing an intervention.",
+  "experiment_number": "UNASSIGNED"
+}

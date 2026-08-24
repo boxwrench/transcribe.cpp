@@ -133,8 +133,8 @@ paths, and checksums stay consistent.
 - `experiments/EXP-0003/` contains the promoted affine layer-normalization
   fusion, shape-complete H1 evidence, 120-request ABBA H2 evidence, and quality
   validation.
-- `experiments/EXP-0004/` freezes the measurement-only gfx1201 execution-system
-  timeline experiment and its observer-effect-qualified first attempt.
+- `investigations/LEAD-0005/` contains the measurement-only gfx1201
+  served-time reconciliation and its observer-effect-qualified first attempt.
 - `decisions/` records qualifications that affect valid measurements.
 - `ledger.jsonl` is the append-only campaign decision log.
 
@@ -172,9 +172,11 @@ The measured graph-benefit differential explains about 61 ms of the 148 ms
 production gap, leaving roughly 87 ms that aggregate kernel duration does not
 explain. Phase behavior is architecture-specific: gfx1201 is slower in FFN and
 convolution but faster in attention, cache/state, and elementwise/layout. This
-lead is now the next diagnostic target. It must begin with a frozen experiment
-that separates graph construction/replay, dispatch, synchronization, CPU, and
-other non-kernel time before proposing another intervention.
+lead is now the primary investigation. It must reconcile request, GPU busy and
+idle, HIP API, graph create/update/launch, copies, synchronization, CPU
+frontend, RNNT decode, and residual time. Counts, transfer bytes, inter-kernel
+gaps, GPU busy fraction, and CPU blocked fraction are mandatory. No
+optimization work is allowed during this measurement phase.
 
 The promoted state is permanently tagged `amd-nemotron-m1` at commit
 `22dbe1c`. Native CUDA validation is still required before upstream submission
@@ -185,12 +187,19 @@ LEAD-0006 separately preserves the deterministic long-stream RNNT numerical
 divergence exposed by EXP-0003. It is important correctness evidence, but stays
 deferred until the primary LEAD-0005 execution-system investigation closes.
 
-EXP-0004 attempt 1 reconciled every captured request but found that rocprofiler
-kernel tracing reverses known graph-enabled production behavior. The result is
+LEAD-0005 measurement attempt 1 reconciled every captured request but found
+that rocprofiler kernel tracing reverses known graph-enabled production
+behavior. The result is
 `HOLD_PROFILER_OBSERVER_EFFECT`; graph-enabled trace ratios are not admitted.
 The graph-disabled trace still places gfx1201 about 102 ms behind and shows
 both a larger GPU-busy union and larger non-busy interval, so LEAD-0005 remains
-open for a lower-overhead in-process measurement.
+open for a lower-overhead in-process measurement. See
+[`investigations/LEAD-0005/`](investigations/LEAD-0005/).
+
+`LEAD` means an observation requiring explanation. `EXP` means a frozen
+intervention intended to test a mechanism. Accordingly, `EXP-0004` is
+unassigned. It will not be created until LEAD-0005 produces a
+production-admissible mechanism and a falsifiable intervention.
 
 No optimization is promoted from a microbenchmark alone. Complete served
 streaming requests and the frozen quality panel remain the final gates.
