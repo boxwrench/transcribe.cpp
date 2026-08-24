@@ -1,14 +1,34 @@
 {
   "schema": "amd-nemotron-experiment-result-v1",
   "experiment_id": "EXP-0001",
-  "decision": "HOLD",
-  "evidence_class": "U",
+  "decision": "QUALIFY",
+  "evidence_class": "C",
   "correctness": "PASS",
+  "authoritative_attempt": "attempts/attempt-2-clean-hardware",
   "measurements": {
-    "gfx1100": {"graph_enabled_mean_ms":1357.929,"graph_disabled_mean_ms":1489.143,"disabled_delta_percent":9.663,"graph_enabled_p95_ms":1429.028,"graph_disabled_p95_ms":2043.175},
-    "gfx1201": {"graph_enabled_mean_ms":1432.711,"graph_disabled_mean_ms":1589.084,"disabled_delta_percent":10.914,"graph_enabled_p95_ms":4547.257,"graph_disabled_p95_ms":2058.233}
+    "gfx1100": {
+      "graph_enabled_mean_ms": 809.311,
+      "graph_disabled_mean_ms": 903.620,
+      "disabled_delta_percent": 11.653,
+      "graph_enabled_p95_ms": 854.540,
+      "graph_disabled_p95_ms": 950.489,
+      "disabled_p95_delta_percent": 11.228
+    },
+    "gfx1201": {
+      "graph_enabled_mean_ms": 1005.126,
+      "graph_disabled_mean_ms": 1037.237,
+      "disabled_delta_percent": 3.195,
+      "graph_enabled_p95_ms": 1071.528,
+      "graph_disabled_p95_ms": 1098.699,
+      "disabled_p95_delta_percent": 2.536
+    }
   },
-  "confounder": "An unrelated vLLM process started during the run on physical GPU 1, used 15-20 GB R9700 VRAM and 32-44% GPU activity, and enabled 56 GB CPU offload. It coincided with gfx1100-disabled spikes and the first two gfx1201-enabled requests.",
-  "interpretation": "Both point estimates favor graphs, but the paired timing result is invalid for causal promotion. Exact transcript and token IDs match in all four arms.",
-  "next_action": "Rerun the unchanged frozen protocol only when both target GPUs and host CPU are idle; randomize or interleave arm order in a successor protocol if background-load control is available."
+  "prior_attempt": {
+    "path": "raw",
+    "decision": "HOLD",
+    "evidence_class": "U",
+    "reason": "unrelated vLLM GPU workload with CPU offload"
+  },
+  "interpretation": "Graphs materially help gfx1100 and modestly help gfx1201. Keep graphs enabled on both targets. The 62.198 ms difference in graph benefit explains part, but not all, of the clean cross-target wall-time gap; graph scheduling is architecture-sensitive, while disabling graphs is not an optimization.",
+  "next_action": "Freeze a shape-matched Q8_0 matvec experiment for LEAD-0003; retain isolated graph-enabled HIP as the served control."
 }

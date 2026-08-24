@@ -8,3 +8,4 @@
 add_subdirectory(transcribe-quantize)
 add_subdirectory(transcribe-bench)
 add_subdirectory(transcribe-stream-bench)
+add_subdirectory(q8-matvec-bench)

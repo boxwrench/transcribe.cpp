@@ -1,0 +1,32 @@
+{
+  "schema": "amd-nemotron-experiment-v1",
+  "experiment_id": "EXP-0002",
+  "lead_id": "LEAD-0003",
+  "state": "FROZEN_BEFORE_INTERVENTION",
+  "runtime_commit": "b85d022dfe316fd96cfc77ac5b47004a9348dd6c",
+  "targets": [
+    {"architecture":"gfx1100","environment":{"HIP_VISIBLE_DEVICES":"0"},"device":0},
+    {"architecture":"gfx1201","environment":{"HIP_VISIBLE_DEVICES":"1"},"device":0}
+  ],
+  "microbenchmark": {
+    "type": "Q8_0 weights, F32 input and output",
+    "graphs": "disabled to isolate dispatch plus kernel",
+    "warmup": 20,
+    "iterations": 500,
+    "shapes": [
+      {"k":1024,"m":1024,"n":1,"weight":60},
+      {"k":1024,"m":4096,"n":1,"weight":48},
+      {"k":4096,"m":1024,"n":1,"weight":48}
+    ]
+  },
+  "control": "stock RDNA3/RDNA4 Q8_0 ncols=1 MMVQ geometry: 8 wavefronts",
+  "intervention": "Q8_0 ncols=1 MMVQ geometry: 4 wavefronts on RDNA3/RDNA4 only",
+  "primary_metric": "frequency-weighted median microseconds per matvec",
+  "secondary_metrics": ["per-shape p50/p95/p99", "complete served request mean/p95", "feed p95/p99"],
+  "numerical_gate": "GPU output agrees with CPU Q8_0 graph at max_abs_error <= 1e-3 and max_rel_error <= 1e-3",
+  "correctness_gate": "exact hyp_text and token_ids_csv match the graph-enabled control on jfk.wav, dots.wav, and noise.wav",
+  "minimum_useful_effect": "weighted microbenchmark >=5% on one target, no target regression >2%, and served mean >=5% on one target with same-direction p95",
+  "kill_condition": "numerical/correctness mismatch, no >=5% served win, or >2% served regression on either target",
+  "resource_gate": "no additional persistent allocation; isolated physical GPU; graph-enabled served validation",
+  "evidence_class_goal": "C then R across the second target"
+}

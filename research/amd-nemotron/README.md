@@ -111,21 +111,50 @@ build/hip-gfx1100/bin/transcribe-stream-bench \
   --feed-ms 80 --att-right 1 --warmup 2 --iters 30 --json-out result.json
 ```
 
+`q8-matvec-bench` is the EXP-0002 screening tool. It builds one Q8_0
+`ggml_mul_mat` graph for an explicit K/M/N shape, compares GPU output with the
+CPU backend, and reports per-dispatch mean/p50/p95/p99. Run it through the
+experiment script so GPU isolation, graph disabling, repetitions, immutable
+paths, and checksums stay consistent.
+
 ## Evidence layout
 
 - `OBJECTIVES.md` freezes priorities, metrics, and correctness gates.
 - `manifests/` records model hashes, workload, devices, waves, and shapes.
 - `baselines/` and `profiles/` contain curated summaries.
 - `leads/` ranks observed opportunities without assuming their mechanism.
-- `experiments/EXP-0001/` contains the frozen graph A/B protocol and raw data.
+- `experiments/EXP-0001/` contains the frozen graph A/B protocol, both attempts,
+  and the authoritative clean result.
+- `experiments/EXP-0002/` contains the Q8_0 geometry protocol, replicated stock
+  evidence, rejected candidate evidence, and the exact killed patch.
 - `decisions/` records qualifications that affect valid measurements.
 - `ledger.jsonl` is the append-only campaign decision log.
 
-EXP-0001 is `HOLD`, not a performance conclusion. An unrelated vLLM workload
-started during its graph-enabled/disabled A/B and contaminated both GPU and
-CPU-offload timing. Exact transcript/token correctness passed, and the raw
-evidence is retained with checksums. Rerun the unchanged protocol on an idle
-machine before changing graph or kernel code.
+EXP-0001 is closed as `QUALIFY`. Its first attempt remains preserved as
+contaminated evidence. In the clean rerun, disabling graphs was 11.65% slower
+on gfx1100 and 3.19% slower on gfx1201, with matching p95 direction and exact
+transcript/token output. Graphs remain enabled. Their architecture-sensitive
+benefit explains 62.198 ms of the clean cross-target gap but does not explain
+the entire contradiction.
+
+## What happens next
+
+EXP-0002 tested four versus eight wavefronts for the dominant single-column
+Q8_0 projections. The candidate was numerically correct and improved the
+`1024x4096` shape by 6.92% on gfx1100 and 10.00% on gfx1201, but it regressed
+the other gfx1201 production shapes by 35–38%. Its frequency-weighted gfx1201
+result was 20.83% slower, confirmed by a rebuilt-stock replication, so the
+decision is `KILL` and the stock eight-wavefront tables are restored.
+
+The next work item is a profiling-only phase map. Build HIP with
+`GGML_CUDA_DEBUG`, run one graph-disabled request per isolated GPU, and align
+the deterministic node/fusion log with the ROCm kernel sequence. Produce
+separate FFN, attention, convolution, cache/state, and elementwise budgets,
+then freeze EXP-0003 only for a candidate with a >=5% recoverable served-time
+ceiling. Do not add a shape-specific four-wavefront branch: its estimated
+14–22 ms complete-request ceiling is below that gate. Q8_0 remains open only
+for a materially different intervention; the four-wavefront geometry must not
+be retried.
 
 No optimization is promoted from a microbenchmark alone. Complete served
 streaming requests and the frozen quality panel remain the final gates.

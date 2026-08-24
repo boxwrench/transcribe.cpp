@@ -1,0 +1,32 @@
+diff --git a/ggml/src/ggml-cuda/mmvq.cu b/ggml/src/ggml-cuda/mmvq.cu
+index c7b5494..0000000 100644
+--- a/ggml/src/ggml-cuda/mmvq.cu
++++ b/ggml/src/ggml-cuda/mmvq.cu
+@@ -399,14 +399,15 @@ static constexpr __host__ __device__ int calc_nwarps(ggml_type type, int ncols_d
+                 case GGML_TYPE_Q4_1:
+                 case GGML_TYPE_Q5_0:
+                 case GGML_TYPE_Q5_1:
+-                case GGML_TYPE_Q8_0:
+                 case GGML_TYPE_Q2_K:
+                 case GGML_TYPE_Q4_K:
+                 case GGML_TYPE_Q5_K:
+                 case GGML_TYPE_Q6_K:
+                 case GGML_TYPE_IQ4_NL:
+                 case GGML_TYPE_IQ4_XS:
+                     return 8;
++                case GGML_TYPE_Q8_0:
++                    return 4;
+                 default:
+                     return 1;
+             }
+@@ -422,8 +423,9 @@ static constexpr __host__ __device__ int calc_nwarps(ggml_type type, int ncols_d
+                 case GGML_TYPE_Q4_1:
+                 case GGML_TYPE_Q5_0:
+                 case GGML_TYPE_Q5_1:
+-                case GGML_TYPE_Q8_0:
+                     return 8;
++                case GGML_TYPE_Q8_0:
++                    return 4;
+                 case GGML_TYPE_Q6_K:
+                     return 2;
+                 case GGML_TYPE_IQ4_NL:

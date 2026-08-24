@@ -1,0 +1,9 @@
+{
+  "schema": "q8-matvec-bench-v1",
+  "backend": "ROCm0",
+  "shape": {"k": 4096, "m": 1024, "n": 1},
+  "warmup": 20,
+  "iterations": 500,
+  "timing_us": {"mean": 32.515994, "p50": 28.275000, "p95": 40.631000, "p99": 46.750000, "min": 26.940000, "max": 97.310000},
+  "correctness": {"max_abs_error": 0.000001, "max_rel_error": 0.000152}
+}

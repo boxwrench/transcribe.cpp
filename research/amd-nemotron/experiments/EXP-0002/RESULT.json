@@ -1,0 +1,23 @@
+{
+  "schema": "amd-nemotron-experiment-result-v1",
+  "experiment_id": "EXP-0002",
+  "decision": "KILL",
+  "evidence_class": "R",
+  "correctness": "PASS",
+  "control_attempts": [
+    "attempts/stock-8-wavefronts",
+    "attempts/stock-8-wavefronts-rebuilt"
+  ],
+  "intervention_attempt": "attempts/candidate-4-wavefronts",
+  "weighted_p50_us": {
+    "gfx1100": {"stock_mean_of_attempts":30.3843,"candidate":29.8006,"delta_percent":-1.921},
+    "gfx1201": {"stock_mean_of_attempts":29.6372,"candidate":35.8104,"delta_percent":20.829}
+  },
+  "shape_p50_delta_percent": {
+    "gfx1100": {"k1024_m1024":-1.199,"k1024_m4096":-6.915,"k4096_m1024":2.846},
+    "gfx1201": {"k1024_m1024":38.477,"k1024_m4096":-10.002,"k4096_m1024":35.947}
+  },
+  "numerical_maxima": {"max_abs_error":0.000001,"max_rel_error":0.000183},
+  "interpretation": "Four wavefronts help the 1024x4096 projection on both targets, but regress two other production shapes and cause a 20.829% frequency-weighted gfx1201 regression. The stock replication confirms the effect.",
+  "next_action": "Keep the stock eight-wavefront tables. Do not pursue a shape-specific four-wavefront dispatch because its estimated served ceiling is below the frozen 5% gate. Retain Q8_0 as diagnostic evidence, but re-rank the next intervention from the remaining profile families."
+}
