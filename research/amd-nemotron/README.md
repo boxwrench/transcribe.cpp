@@ -138,6 +138,8 @@ paths, and checksums stay consistent.
   baseline across both models, multiple audio conditions, and lookaheads.
 - `ffn/` contains the bounded production-shape path screen and its park
   decision; it is an investigation, not EXP-0004.
+- `convolution/` shows that direct depthwise convolution is already active and
+  preserves the fallback control that closes LEAD-0007.
 - `investigations/LEAD-0005/` contains the measurement-only gfx1201
   served-time reconciliation and its observer-effect-qualified first attempt.
 - `decisions/` records qualifications that affect valid measurements.
@@ -231,8 +233,21 @@ through the existing MMVQ, MMQ, and hipBLAS routes. The best candidate was a
 gfx1201-only MMQ route for the first projection: 22.62% faster locally, but
 only 13.54% projected for the full FFN chain and roughly 1.62% served. It
 misses the frozen 30% local-headroom and 3% served gates. LEAD-0003 is parked,
-EXP-0004 remains unassigned, and LEAD-0007 direct depthwise convolution is now
-the sole primary optimization investigation. See [`ffn/`](ffn/).
+EXP-0004 remains unassigned, and LEAD-0007 direct depthwise convolution became
+the final bounded optimization investigation. See [`ffn/`](ffn/).
+
+LEAD-0007 found that every one of the 1,820 production depthwise nodes already
+uses the direct `CONV_2D_DW` kernel; zero depthwise weights traverse im2col.
+Forcing the old fallback regressed served mean by 8.01% on gfx1100 and 2.64%
+on gfx1201 with exact transcript/token output. The desired optimization is
+already present, and the remaining direct-kernel work has less than a 1%
+served ceiling. See [`convolution/`](convolution/).
+
+Wave 1's optimization search is therefore complete under
+[`STOPPING-POLICY.md`](STOPPING-POLICY.md). EXP-0004 remains unassigned. The
+next phase is native CUDA validation and upstreaming of EXP-0003, followed by
+packaging and release documentation; optimization only reopens for a new
+production-observed mechanism that passes the stopping policy.
 
 No optimization is promoted from a microbenchmark alone. Complete served
 streaming requests and the frozen quality panel remain the final gates.

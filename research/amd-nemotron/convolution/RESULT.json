@@ -1,0 +1,29 @@
+{
+  "schema": "amd-nemotron-depthwise-convolution-screen-v1",
+  "status": "PARK_ALREADY_DIRECT_NO_NEW_MECHANISM",
+  "experiment_assigned": false,
+  "production_trace": {
+    "gfx1100": {"depthwise_nodes": 1820, "block_nodes": 1680, "pre_encode_nodes": 140, "depthwise_im2col_nodes": 0, "direct_kernel_ms": 7.069175},
+    "gfx1201": {"depthwise_nodes": 1820, "block_nodes": 1680, "pre_encode_nodes": 140, "depthwise_im2col_nodes": 0, "direct_kernel_ms": 5.056139},
+    "kernel": "conv2d_dw_kernel<float, whcn_layout>",
+    "graph_op": "CONV_2D_DW"
+  },
+  "served_control": {
+    "protocol": "10 measured requests after two warmups; direct default versus TRANSCRIBE_CONV_NO_DIRECT_DW=1 im2col fallback",
+    "artifact_sha256": {
+      "gfx1100_direct": "f2733b76986216b2fc085b49618021b1e776ec150978b31fc5decfcdc0a5e182",
+      "gfx1100_im2col": "db0e4225f8783fdfd5d414ddabd3e901eb4154ff816a5b9e371b970653ece14f",
+      "gfx1201_direct": "c9c5a34153581524035b3fa42d541cb71d706dca98038e048c518d3287c345bd",
+      "gfx1201_im2col": "ec7e19b56d52238ab5d1fe11838e3ff0ec777cc0d46611401243efe7d689bdbd"
+    },
+    "gfx1100": {"direct_mean_ms": 770.925, "direct_p95_ms": 801.377, "im2col_mean_ms": 838.013, "im2col_p95_ms": 847.704, "direct_gain_percent": 8.006},
+    "gfx1201": {"direct_mean_ms": 885.133, "direct_p95_ms": 901.676, "im2col_mean_ms": 909.092, "im2col_p95_ms": 922.121, "direct_gain_percent": 2.635},
+    "transcript_match": true,
+    "token_ids_match": true
+  },
+  "remaining_direct_depthwise_ceiling_percent": {
+    "gfx1100": 0.917,
+    "gfx1201": 0.571
+  },
+  "decision": "The structural optimization proposed by LEAD-0007 is already the production default. Direct depthwise work has less than a 1% impossible-elimination served ceiling. Do not create EXP-0004."
+}
