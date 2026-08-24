@@ -133,6 +133,8 @@ paths, and checksums stay consistent.
 - `experiments/EXP-0003/` contains the promoted affine layer-normalization
   fusion, shape-complete H1 evidence, 120-request ABBA H2 evidence, and quality
   validation.
+- `experiments/EXP-0004/` freezes the measurement-only gfx1201 execution-system
+  timeline experiment and its observer-effect-qualified first attempt.
 - `decisions/` records qualifications that affect valid measurements.
 - `ledger.jsonl` is the append-only campaign decision log.
 
@@ -173,6 +175,22 @@ convolution but faster in attention, cache/state, and elementwise/layout. This
 lead is now the next diagnostic target. It must begin with a frozen experiment
 that separates graph construction/replay, dispatch, synchronization, CPU, and
 other non-kernel time before proposing another intervention.
+
+The promoted state is permanently tagged `amd-nemotron-m1` at commit
+`22dbe1c`. Native CUDA validation is still required before upstream submission
+because this machine contains no NVIDIA device or CUDA toolkit; see
+[`DEC-0002`](decisions/DEC-0002-native-cuda-validation.md).
+
+LEAD-0006 separately preserves the deterministic long-stream RNNT numerical
+divergence exposed by EXP-0003. It is important correctness evidence, but stays
+deferred until the primary LEAD-0005 execution-system investigation closes.
+
+EXP-0004 attempt 1 reconciled every captured request but found that rocprofiler
+kernel tracing reverses known graph-enabled production behavior. The result is
+`HOLD_PROFILER_OBSERVER_EFFECT`; graph-enabled trace ratios are not admitted.
+The graph-disabled trace still places gfx1201 about 102 ms behind and shows
+both a larger GPU-busy union and larger non-busy interval, so LEAD-0005 remains
+open for a lower-overhead in-process measurement.
 
 No optimization is promoted from a microbenchmark alone. Complete served
 streaming requests and the frozen quality panel remain the final gates.

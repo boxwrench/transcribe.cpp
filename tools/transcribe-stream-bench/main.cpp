@@ -4,6 +4,10 @@
 #include "transcribe/parakeet.h"
 #include "wav.h"
 
+#ifdef TRANSCRIBE_ROCTX_PROFILE
+#include <rocprofiler-sdk-roctx/roctx.h>
+#endif
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -383,7 +387,15 @@ int main(int argc, char ** argv) {
             std::fprintf(stderr, "stream %d/%d\n", i + 1, args.iters);
         }
         iter_result result;
+#ifdef TRANSCRIBE_ROCTX_PROFILE
+        char range_name[64];
+        std::snprintf(range_name, sizeof(range_name), "transcribe|request|iter=%d", i);
+        roctxRangePushA(range_name);
+#endif
         st = run_stream(ctx, args, pcm, true, result);
+#ifdef TRANSCRIBE_ROCTX_PROFILE
+        roctxRangePop();
+#endif
         if (st != TRANSCRIBE_OK) {
             std::fprintf(stderr, "error: stream %d: %s\n", i + 1, transcribe_status_string(st));
             transcribe_session_free(ctx);

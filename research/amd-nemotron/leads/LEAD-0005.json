@@ -11,5 +11,5 @@
   "correctness_risk": "low for profiling-only work",
   "implementation_cost": "P1 diagnostic experiment after EXP-0003",
   "priority": "P1",
-  "status": "OPEN-NEXT"
+  "status": "OPEN-EXP-0004-ATTEMPT-1-HOLD"
 }

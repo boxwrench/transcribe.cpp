@@ -1,0 +1,20 @@
+{
+  "lead_id": "LEAD-0006",
+  "title": "Cross-architecture numerical divergence in long-stream RNNT decoding",
+  "source": "EXP-0003 expanded quality validation",
+  "observation": "The algebraically equivalent affine-LayerNorm fusion changes final tensors by only about 1e-7, yet stock gfx1201 follows a deterministic long-stream transcript trajectory with 42.07% normalized word-token error while the fused gfx1201 trajectory matches gfx1100 at 37.39%.",
+  "evidence": ["research/amd-nemotron/experiments/EXP-0003/RESULT.json", "research/amd-nemotron/experiments/EXP-0003/VALIDATION.md"],
+  "questions": [
+    "Where do gfx1100 and stock gfx1201 first diverge?",
+    "Does divergence begin in encoder activations or decoder/token selection?",
+    "How does F32, F16, or Q8_0 change the trajectory?",
+    "Does fusion merely perturb gfx1201 toward the gfx1100 trajectory?",
+    "Does deterministic gfx1201 reproduce the same divergent trajectory across cold starts and builds?"
+  ],
+  "suspected_mechanism": "small cross-architecture floating-point differences cross sensitive RNNT token-selection boundaries and compound autoregressively",
+  "cheapest_falsifier": "capture layer/checkpoint hashes and decoder logits around the first stock gfx1100/gfx1201 token divergence on dots-full.wav",
+  "correctness_risk": "high for numerically close optimizations because transcript identity is not implied by small tensor error",
+  "implementation_cost": "P2 diagnostic instrumentation",
+  "priority": "P2",
+  "status": "OPEN-DEFERRED-AFTER-LEAD-0005"
+}

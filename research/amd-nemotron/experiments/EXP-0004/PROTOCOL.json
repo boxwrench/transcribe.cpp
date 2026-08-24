@@ -1,0 +1,32 @@
+{
+  "schema": "amd-nemotron-experiment-v1",
+  "experiment_id": "EXP-0004",
+  "lead_id": "LEAD-0005",
+  "state": "FROZEN_BEFORE_CAPTURE",
+  "runtime_commit": "22dbe1c85a299976388ee1ec6b2d4cc7c9da1220",
+  "model": "nemotron-speech-streaming-en-0.6b-Q8_0",
+  "model_sha256": "90d8c89714cd31efc88be62a40c6b2bea57e0cc2063af1ffe2c28f1a228ca110",
+  "workload": {"audio":"samples/jfk.wav","feed_ms":80,"att_right":1,"warmup":2,"profiled_iterations":3},
+  "targets": [
+    {"architecture":"gfx1100","build":"build/hip-gfx1100","environment":{"HIP_VISIBLE_DEVICES":"0"},"device":0},
+    {"architecture":"gfx1201","build":"build/hip-gfx1201","environment":{"HIP_VISIBLE_DEVICES":"1"},"device":0}
+  ],
+  "conditions": ["graphs enabled", "GGML_CUDA_DISABLE_GRAPHS=1"],
+  "trace_domains": ["ROCTx request ranges", "HIP runtime API", "kernel dispatch", "memory copy"],
+  "request_scope": "each measured stream is enclosed by an ROCTx range after two warmups; initialization and teardown are excluded",
+  "device_view": "request wall = union(kernel and memory-copy intervals) + all remaining request time",
+  "host_view": "request wall = union(HIP API intervals) + all remaining non-HIP application time",
+  "critical_path_priority": ["GPU busy", "HIP synchronization", "graph management", "dispatch or memcpy API", "other HIP API", "non-HIP host"],
+  "required_metrics": [
+    "T_request", "T_GPU_busy", "T_GPU_nonbusy", "T_GPU_idle_inside_submission",
+    "T_HIP_API_inclusive", "T_graph_management", "T_memcpy", "T_sync_wait",
+    "T_CPU_frontend_reported", "T_CPU_decoder_reported", "T_non_HIP_host", "T_other",
+    "GPU_busy_over_request"
+  ],
+  "reconciliation_gate": "device and host decompositions each sum to request wall within 1 ms or 0.5%, whichever is larger; critical-path buckets are mutually exclusive and sum exactly after timestamp clipping",
+  "replication_gate": "three profiled measured requests per condition and target; report every request plus median, never treat profiler wall time as production latency",
+  "sensor_metadata": "record AMD SMI clocks, temperature, power, and utilization immediately before and after each capture when available",
+  "correctness_gate": "exact hyp_text and token_ids_csv match the promoted EXP-0003 result within each target and graph condition",
+  "decision_rule": "select an optimization lead only if one stable bucket explains at least 50% of the reconciled cross-target non-GPU gap; otherwise HOLD and add finer instrumentation",
+  "evidence_class_goal": "C"
+}
