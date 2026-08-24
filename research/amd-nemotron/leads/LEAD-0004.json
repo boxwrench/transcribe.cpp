@@ -1,0 +1,15 @@
+{
+  "lead_id": "LEAD-0004",
+  "source": "node-renamed graph-disabled phase profile",
+  "observation": "10,080 affine layer-normalization NORM -> MUL -> ADD sequences dispatch 30,240 kernels per English request.",
+  "evidence": ["research/amd-nemotron/phase-map/RESULT.json"],
+  "affected_phase_shapes": ["Conformer FFN normalization", "attention normalization", "convolution normalization", "1024-wide F32 streaming rows"],
+  "wall_clock_share": "71.456 ms gfx1100 / 56.779 ms gfx1201 of graph-disabled traced kernel duration",
+  "amdahl_ceiling": "9.14% gfx1100 / 6.11% gfx1201 versus unprofiled served-request means",
+  "suspected_mechanism": "ordinary layer normalization lacks the existing RMS_NORM -> MUL -> ADD CUDA fusion and pays three launches plus two intermediate round trips",
+  "cheapest_falsifier": "extend the existing fused RMS normalization kernel structure to NORM and count one dispatch for each eligible three-node chain",
+  "correctness_risk": "medium: arithmetic ordering changes and must pass numerical plus exact transcript gates",
+  "implementation_cost": "P2 localized ggml-cuda fusion",
+  "priority": "P1",
+  "status": "PROMOTED-AS-EXP-0003"
+}

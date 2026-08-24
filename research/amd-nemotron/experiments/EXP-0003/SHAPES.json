@@ -1,0 +1,33 @@
+{
+  "schema": "amd-nemotron-affine-norm-shapes-v1",
+  "source": "graph-disabled English Q8_0 jfk.wav node trace plus GGML_CUDA_DEBUG metadata",
+  "total_occurrences": 10080,
+  "broadcast": {
+    "gamma_ne": [1024, 1, 1, 1],
+    "gamma_nb_bytes": [4, 4096, 4096, 4096],
+    "beta_ne": [1024, 1, 1, 1],
+    "beta_nb_bytes": [4, 4096, 4096, 4096]
+  },
+  "shapes": [
+    {
+      "input_ne": [1024, 2, 1, 1],
+      "input_nb_bytes": [4, 4096, 8192, 8192],
+      "occurrences": 9936,
+      "frequency_weight": 0.9857142857,
+      "gfx1100_kernel_ms": 69.994709,
+      "gfx1100_candidate_time_share": 0.979551,
+      "gfx1201_kernel_ms": 55.949230,
+      "gfx1201_candidate_time_share": 0.985383
+    },
+    {
+      "input_ne": [1024, 1, 1, 1],
+      "input_nb_bytes": [4, 4096, 4096, 4096],
+      "occurrences": 144,
+      "frequency_weight": 0.0142857143,
+      "gfx1100_kernel_ms": 1.460964,
+      "gfx1100_candidate_time_share": 0.020449,
+      "gfx1201_kernel_ms": 0.829970,
+      "gfx1201_candidate_time_share": 0.014617
+    }
+  ]
+}

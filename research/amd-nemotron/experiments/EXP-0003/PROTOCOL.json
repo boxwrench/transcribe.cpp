@@ -1,0 +1,34 @@
+{
+  "schema": "amd-nemotron-experiment-v1",
+  "experiment_id": "EXP-0003",
+  "lead_id": "LEAD-0004",
+  "state": "FROZEN_BEFORE_INTERVENTION",
+  "runtime_commit": "43261ead7069fe7e27b01d5f74dc65ff19e2e4fa",
+  "targets": [
+    {"architecture":"gfx1100","environment":{"HIP_VISIBLE_DEVICES":"0"},"device":0},
+    {"architecture":"gfx1201","environment":{"HIP_VISIBLE_DEVICES":"1"},"device":0}
+  ],
+  "control": "stock ggml-cuda NORM, MUL, and ADD kernels",
+  "intervention": "fused F32 NORM -> broadcast MUL -> broadcast ADD kernel using the existing RMS fusion layout checks",
+  "workload": "English Q8_0 jfk.wav streaming, 80 ms feeds, R=1",
+  "hypotheses": {
+    "H1": "graph-disabled computational/memory fusion reduces frequency-weighted kernel time across every material production shape",
+    "H2": "one node/dispatch instead of three improves graph-enabled complete served latency"
+  },
+  "shape_manifest": "SHAPES.json",
+  "primary_metric": "ABBA-blocked complete graph-enabled served request mean",
+  "secondary_metrics": ["complete request p95", "feed p95/p99", "frequency-weighted graph-disabled shape time", "eligible chain dispatch count", "encoder time"],
+  "discovery": {"warmup": 2, "iterations_per_condition": 30},
+  "promotion": {"warmup": 2, "iterations_per_condition": 120, "schedule": "ABBA blocks with stock and candidate binaries interleaved"},
+  "numerical_gate": "fused GPU affine-LN output agrees with unfused CPU output for both production shapes at max_abs_error <= 1e-4 and max_rel_error <= 1e-4; internal bit identity is not required",
+  "correctness_gate": "exact hyp_text and token_ids_csv match stock on jfk.wav, dots.wav, and noise.wav",
+  "decision_ladder": {
+    "PROMOTE": ">=5% served mean win on one target, same-direction p95, no >2% regression on the other, quality passes",
+    "QUALIFY": "repeatable 2-5% served win on both, or >=5% on one architecture with a justified architecture-specific gate",
+    "HOLD": "substantial graph-disabled shape win without a served-request win",
+    "KILL": "material shape regression, >2% served regression, or numerical/quality failure"
+  },
+  "kill_condition": "numerical/quality mismatch, material production-shape regression, or >2% served regression on either target",
+  "resource_gate": "no persistent allocation; isolated physical GPU; graph-enabled served validation",
+  "evidence_class_goal": "C then R across the second target"
+}

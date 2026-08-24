@@ -1,0 +1,88 @@
+{
+  "schema": "amd-nemotron-exp0003-result-v1",
+  "experiment_id": "EXP-0003",
+  "decision": "PROMOTE",
+  "implementation": "fused F32 NORM -> broadcast MUL -> broadcast ADD HIP kernel",
+  "dispatch_validation": {
+    "eligible_chains": 10080,
+    "fused_nodes_per_chain": 3,
+    "observed_fusion_selections": 10080
+  },
+  "numerical_validation": {
+    "limit": 0.0001,
+    "targets_identical": true,
+    "shapes": [
+      {"ne":[1024,1,1,1],"max_abs_error":1.1920929e-7,"max_rel_error":1.94090993e-6},
+      {"ne":[1024,2,1,1],"max_abs_error":3.57627869e-7,"max_rel_error":3.70132192e-6}
+    ],
+    "passed": true
+  },
+  "h1_graph_disabled_shape_benchmark": {
+    "warmup": 20,
+    "iterations_per_replication": 1000,
+    "replications": 2,
+    "weight_source": "SHAPES.json occurrence frequency",
+    "targets": {
+      "gfx1100": {
+        "per_shape_mean_us": [
+          {"ne":[1024,1,1,1],"stock":32.596929,"candidate":24.652154},
+          {"ne":[1024,2,1,1],"stock":29.963093,"candidate":22.370134}
+        ],
+        "stock_weighted_mean_us": 30.000719,
+        "candidate_weighted_mean_us": 22.402734,
+        "change_pct": -25.326009,
+        "all_shapes_improved": true
+      },
+      "gfx1201": {
+        "per_shape_mean_us": [
+          {"ne":[1024,1,1,1],"stock":29.350470,"candidate":21.565141},
+          {"ne":[1024,2,1,1],"stock":28.484691,"candidate":21.249454}
+        ],
+        "stock_weighted_mean_us": 28.497059,
+        "candidate_weighted_mean_us": 21.253964,
+        "change_pct": -25.416993,
+        "all_shapes_improved": true
+      }
+    },
+    "hypothesis": "SUPPORTED"
+  },
+  "h2_graph_enabled_promotion": {
+    "schedule": "8 ABBA-balanced blocks of 30 requests; 120 requests per condition per target",
+    "targets": {
+      "gfx1100": {
+        "stock_request_wall_ms": {"mean":847.127708,"p50":830.760500,"p95":948.170900,"p99":1031.427850},
+        "candidate_request_wall_ms": {"mean":801.437042,"p50":778.211500,"p95":919.541550,"p99":1000.675480},
+        "change_pct": {"mean":-5.393598,"p95":-3.019429},
+        "exact_jfk_output": true
+      },
+      "gfx1201": {
+        "stock_request_wall_ms": {"mean":983.842558,"p50":977.556000,"p95":1052.224400,"p99":1099.665860},
+        "candidate_request_wall_ms": {"mean":914.533775,"p50":913.101000,"p95":957.933650,"p99":1000.922550},
+        "change_pct": {"mean":-7.044703,"p95":-8.961088},
+        "exact_jfk_output": true
+      }
+    },
+    "hypothesis": "SUPPORTED"
+  },
+  "quality": {
+    "jfk_dots_noise_exact": true,
+    "expanded_panel": {
+      "love_loss_clean_conversation_exact_both_targets": true,
+      "german_multilingual_exact_both_targets": true,
+      "dots_full_gfx1100_exact": true,
+      "dots_full_gfx1201": {
+        "stock_normalized_word_error_pct": 42.0664,
+        "candidate_normalized_word_error_pct": 37.3924,
+        "candidate_matches_gfx1100": true,
+        "replicated_deterministically": true
+      }
+    },
+    "passed": true
+  },
+  "tests": {
+    "gfx1100": "37/37 passed in isolated rerun",
+    "gfx1201": "37/37 passed",
+    "qualification": "one initial parallel utf8_path_unit collision shared the same /tmp path; isolated rerun passed"
+  },
+  "next_action": "Promote affine LayerNorm fusion by default and freeze a diagnostic experiment for LEAD-0005 gfx1201 non-kernel/graph/dispatch overhead."
+}

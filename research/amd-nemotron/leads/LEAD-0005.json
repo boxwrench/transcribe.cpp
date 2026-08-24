@@ -1,0 +1,15 @@
+{
+  "lead_id": "LEAD-0005",
+  "source": "EXP-0001 graph A/B plus node-renamed phase map",
+  "observation": "gfx1201 is 148 ms slower in the production English baseline although graph-disabled aggregate kernel duration is nearly equal. The measured graph benefit is approximately 91.1 ms on gfx1100 and 29.7 ms on gfx1201, explaining about 61.4 ms or 41% of the gap and leaving approximately 86.6 ms residual.",
+  "evidence": ["research/amd-nemotron/experiments/EXP-0001/RESULT.json", "research/amd-nemotron/phase-map/RESULT.json"],
+  "affected_phase_shapes": ["graph launch", "host dispatch", "synchronization", "architecture-specific FFN and convolution kernels"],
+  "wall_clock_share": "approximately 86.6 ms residual production gap after the measured graph-benefit differential",
+  "amdahl_ceiling": "up to the unexplained 9.3% of gfx1201 served time, pending causal attribution",
+  "suspected_mechanism": "non-kernel graph/dispatch/synchronization overhead plus architecture-specific phase behavior; aggregate kernel speed is not a sufficient model",
+  "cheapest_falsifier": "interleaved host/API timeline with graph construction, graph launch, synchronization, and idle-gap attribution on both isolated GPUs",
+  "correctness_risk": "low for profiling-only work",
+  "implementation_cost": "P1 diagnostic experiment after EXP-0003",
+  "priority": "P1",
+  "status": "OPEN-NEXT"
+}

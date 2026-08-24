@@ -1,0 +1,35 @@
+{
+  "schema": "amd-nemotron-phase-map-comparison-v1",
+  "runtime_commit": "43261ead7069fe7e27b01d5f74dc65ff19e2e4fa",
+  "workload": "nemotron-speech-streaming-en-0.6b Q8_0, jfk.wav, 80 ms feeds, R=1, graphs disabled",
+  "targets": {
+    "gfx1100": {
+      "served_baseline_ms": 782,
+      "total_kernel_ms": 430.172750,
+      "budgets": {
+        "FFN": {"calls": 20160, "kernel_ms": 113.037037, "kernel_pct": 26.2771},
+        "attention": {"calls": 22032, "kernel_ms": 68.383579, "kernel_pct": 15.8968},
+        "convolution": {"calls": 14069, "kernel_ms": 70.951520, "kernel_pct": 16.4937},
+        "cache/state": {"calls": 13440, "kernel_ms": 28.750137, "kernel_pct": 6.6834},
+        "elementwise/layout": {"calls": 57076, "kernel_ms": 124.427561, "kernel_pct": 28.9250},
+        "runtime/memory": {"calls": 8933, "kernel_ms": 24.622916, "kernel_pct": 5.7240}
+      },
+      "affine_norm_candidate": {"instances": 10080, "kernel_calls": 30240, "kernel_ms": 71.455673, "served_time_ceiling_pct": 9.1376}
+    },
+    "gfx1201": {
+      "served_baseline_ms": 930,
+      "total_kernel_ms": 430.319043,
+      "budgets": {
+        "FFN": {"calls": 20160, "kernel_ms": 129.861973, "kernel_pct": 30.1781},
+        "attention": {"calls": 22032, "kernel_ms": 55.847882, "kernel_pct": 12.9783},
+        "convolution": {"calls": 13860, "kernel_ms": 79.127602, "kernel_pct": 18.3881},
+        "cache/state": {"calls": 13440, "kernel_ms": 24.106539, "kernel_pct": 5.6020},
+        "elementwise/layout": {"calls": 57076, "kernel_ms": 119.965309, "kernel_pct": 27.8782},
+        "runtime/memory": {"calls": 8933, "kernel_ms": 21.409738, "kernel_pct": 4.9753}
+      },
+      "affine_norm_candidate": {"instances": 10080, "kernel_calls": 30240, "kernel_ms": 56.779200, "served_time_ceiling_pct": 6.1053}
+    }
+  },
+  "decision": "FREEZE_EXP-0003",
+  "selected_candidate": "Fuse NORM -> MUL -> ADD affine layer normalization into one HIP kernel"
+}

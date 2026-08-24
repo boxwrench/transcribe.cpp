@@ -8,9 +8,10 @@ This campaign establishes a reproducible AMD/Linux baseline for NVIDIA's two
 
 The measured targets are a Radeon RX 7900 XT (`gfx1100`) and Radeon AI PRO
 R9700 (`gfx1201`) using CPU/OpenBLAS, Vulkan/RADV, and ROCm 7.2.1 HIP builds.
-Milestone 1 covers correctness, controlled Q8_0 baselines, route and shape
-proof, ROCm profiling, ranked leads, and one frozen experiment. It deliberately
-does not claim that an AMD kernel optimization has already been promoted.
+Milestone 1 established correctness, controlled Q8_0 baselines, route and shape
+proof, ROCm profiling, and ranked leads. The follow-on wrenchwork has now
+promoted one cross-architecture HIP kernel optimization through complete
+served and quality validation.
 
 ## Results
 
@@ -127,6 +128,11 @@ paths, and checksums stay consistent.
   and the authoritative clean result.
 - `experiments/EXP-0002/` contains the Q8_0 geometry protocol, replicated stock
   evidence, rejected candidate evidence, and the exact killed patch.
+- `phase-map/` contains the graph-disabled node-to-kernel attribution and the
+  diagnostic ROCTx patch used to produce it.
+- `experiments/EXP-0003/` contains the promoted affine layer-normalization
+  fusion, shape-complete H1 evidence, 120-request ABBA H2 evidence, and quality
+  validation.
 - `decisions/` records qualifications that affect valid measurements.
 - `ledger.jsonl` is the append-only campaign decision log.
 
@@ -146,15 +152,27 @@ the other gfx1201 production shapes by 35–38%. Its frequency-weighted gfx1201
 result was 20.83% slower, confirmed by a rebuilt-stock replication, so the
 decision is `KILL` and the stock eight-wavefront tables are restored.
 
-The next work item is a profiling-only phase map. Build HIP with
-`GGML_CUDA_DEBUG`, run one graph-disabled request per isolated GPU, and align
-the deterministic node/fusion log with the ROCm kernel sequence. Produce
-separate FFN, attention, convolution, cache/state, and elementwise budgets,
-then freeze EXP-0003 only for a candidate with a >=5% recoverable served-time
-ceiling. Do not add a shape-specific four-wavefront branch: its estimated
-14–22 ms complete-request ceiling is below that gate. Q8_0 remains open only
-for a materially different intervention; the four-wavefront geometry must not
-be retried.
+The graph-disabled phase map found 10,080 repeated `NORM -> MUL -> ADD`
+affine layer-normalization chains. EXP-0003 now fuses each eligible chain into
+one kernel using the existing fused RMSNorm design as precedent. The complete
+production-shape benchmark improved 25.33% on gfx1100 and 25.42% on gfx1201.
+In 120-request ABBA served validation, mean latency improved 5.39% and 7.04%,
+while p95 improved 3.02% and 8.96%. Numerical limits, transcript checks, the
+expanded quality panel, and 37/37 repository tests pass. Decision: `PROMOTE`.
+See [`experiments/EXP-0003/DECISION.md`](experiments/EXP-0003/DECISION.md).
+
+Do not add a shape-specific four-wavefront branch. Q8_0 remains open only for
+a materially different intervention; the four-wavefront geometry must not be
+retried.
+
+LEAD-0005 separately preserves the unresolved gfx1201 execution-overhead gap.
+The measured graph-benefit differential explains about 61 ms of the 148 ms
+production gap, leaving roughly 87 ms that aggregate kernel duration does not
+explain. Phase behavior is architecture-specific: gfx1201 is slower in FFN and
+convolution but faster in attention, cache/state, and elementwise/layout. This
+lead is now the next diagnostic target. It must begin with a frozen experiment
+that separates graph construction/replay, dispatch, synchronization, CPU, and
+other non-kernel time before proposing another intervention.
 
 No optimization is promoted from a microbenchmark alone. Complete served
 streaming requests and the frozen quality panel remain the final gates.

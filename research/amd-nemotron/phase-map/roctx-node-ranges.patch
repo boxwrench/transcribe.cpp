@@ -1,0 +1,55 @@
+diff --git a/ggml/src/ggml-cuda/ggml-cuda.cu b/ggml/src/ggml-cuda/ggml-cuda.cu
+index f2e381e..3baf76d 100644
+--- a/ggml/src/ggml-cuda/ggml-cuda.cu
++++ b/ggml/src/ggml-cuda/ggml-cuda.cu
+@@ -69,6 +69,10 @@
+ #include "ggml-cuda/lightning-indexer.cuh"
+ #include "ggml.h"
+
++#ifdef GGML_CUDA_ROCTX_PROFILE
++#include <rocprofiler-sdk-roctx/roctx.h>
++#endif
++
+ #include <algorithm>
+ #include <array>
+ #include <atomic>
+@@ -4136,6 +4140,18 @@ static void ggml_cuda_graph_evaluate_and_capture(ggml_backend_cuda_context * cud
+                     continue;
+                 }
+
++#ifdef GGML_CUDA_ROCTX_PROFILE
++                char roctx_label[512];
++                std::snprintf(roctx_label, sizeof(roctx_label),
++                        "ggml|node=%d|op=%s|dst=%s|src0=%s|src1=%s|ne=%lldx%lldx%lldx%lld",
++                        i, ggml_op_name(node->op), node->name,
++                        node->src[0] != nullptr ? node->src[0]->name : "",
++                        node->src[1] != nullptr ? node->src[1]->name : "",
++                        static_cast<long long>(node->ne[0]), static_cast<long long>(node->ne[1]),
++                        static_cast<long long>(node->ne[2]), static_cast<long long>(node->ne[3]));
++                roctxRangePushA(roctx_label);
++#endif
++
+                 int nodes_to_skip = ggml_cuda_try_fuse(cuda_ctx, cgraph, i);
+
+                 if (nodes_to_skip != 0) {
+@@ -4144,6 +4160,9 @@ static void ggml_cuda_graph_evaluate_and_capture(ggml_backend_cuda_context * cud
+                     GGML_LOG_INFO("nodes_fused: %d, first: %s (%s), last: %s (%s)\n",
+                             nodes_to_skip + 1, ggml_op_name(node->op), node->name,
+                             ggml_op_name(cgraph->nodes[last_fused]->op), cgraph->nodes[last_fused]->name);
++#endif
++#ifdef GGML_CUDA_ROCTX_PROFILE
++                    roctxRangePop();
+ #endif
+                     i += nodes_to_skip;
+                     continue;
+@@ -4171,6 +4190,10 @@ static void ggml_cuda_graph_evaluate_and_capture(ggml_backend_cuda_context * cud
+                 }
+                 GGML_ASSERT(ok);
+
++#ifdef GGML_CUDA_ROCTX_PROFILE
++                roctxRangePop();
++#endif
++
+                 if (!is_concurrent_event_active) {
+                     try_launch_concurrent_event(node);
+                }
