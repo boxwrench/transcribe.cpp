@@ -27,7 +27,8 @@ already enabled and its remaining kernel work has less than a 1% ceiling. No
 other post-EXP-0003 lead has both an obvious >5% served opportunity and a
 bounded mechanism. EXP-0004 remains unassigned.
 
-Remaining work is release engineering rather than open-ended tuning: native
-CUDA validation and upstreaming of EXP-0003, packaging/reproducibility checks,
-and release documentation. Reopen optimization only when a new production
-profile exposes a concrete mechanism that passes this policy.
+Remaining work is AMD release engineering rather than open-ended tuning:
+packaging/reproducibility checks, release documentation, and an explicitly
+HIP-tested upstream proposal for EXP-0003. Native CUDA is outside this
+project's release gate. Reopen optimization only when a new production profile
+exposes a concrete mechanism that passes this policy.

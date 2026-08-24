@@ -14,14 +14,19 @@ also pass the project's transcript and streaming/WER gates.
 Reproduce each target with:
 
 ```bash
-research/amd-nemotron/scripts/run-promoted-quality.sh \
-  exp0004-gfx1100 0 gfx1100 /tmp/amd-nemotron-quality-gfx1100
-research/amd-nemotron/scripts/run-promoted-quality.sh \
-  exp0004-gfx1201 1 gfx1201 /tmp/amd-nemotron-quality-gfx1201
-```
+cmake -S . -B build/amd-wave1-gfx1100 -DTRANSCRIBE_HIP=ON \
+  -DAMDGPU_TARGETS=gfx1100 -DTRANSCRIBE_BUILD_TOOLS=ON \
+  -DCMAKE_BUILD_TYPE=Release
+cmake --build build/amd-wave1-gfx1100 --target transcribe-cli -j
+cmake -S . -B build/amd-wave1-gfx1201 -DTRANSCRIBE_HIP=ON \
+  -DAMDGPU_TARGETS=gfx1201 -DTRANSCRIBE_BUILD_TOOLS=ON \
+  -DCMAKE_BUILD_TYPE=Release
+cmake --build build/amd-wave1-gfx1201 --target transcribe-cli -j
 
-The `exp0004-*` labels are legacy build-directory names from the measurement
-work later reclassified as LEAD-0005; the recorded runtime commit is the
-promoted source state and EXP-0004 remains unassigned.
+research/amd-nemotron/scripts/run-promoted-quality.sh \
+  amd-wave1-gfx1100 0 gfx1100 /tmp/amd-nemotron-quality-gfx1100
+research/amd-nemotron/scripts/run-promoted-quality.sh \
+  amd-wave1-gfx1201 1 gfx1201 /tmp/amd-nemotron-quality-gfx1201
+```
 
 The machine-readable case hashes and model identities are in `RESULT.json`.

@@ -77,6 +77,11 @@ be required explicitly with `--backend rocm`.
 
 `libopenblas-dev` is optional but recommended. It accelerates the host-side decoder ~10-15x. Without it the build falls back to a scalar path automatically.
 
+For the validated Nemotron streaming setup on RX 7900 XT (`gfx1100`) and
+Radeon AI PRO R9700 (`gfx1201`), including model downloads, GPU isolation,
+recommended streaming settings, benchmarks, and Wave 1 results, see
+[`docs/amd-nemotron-rocm.md`](docs/amd-nemotron-rocm.md).
+
 tinyBLAS (Justine Tunney's `llamafile_sgemm` kernels) is on by default.
 
 To build the quantization tool:

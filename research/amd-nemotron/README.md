@@ -183,9 +183,10 @@ lead was investigated as measurement-only work: no optimization was allowed
 until request, HIP API, graph, synchronization, and frontend timing had been
 reconciled. Attempt 2 below supplied the bounded answer and parked the lead.
 
-The promoted state is permanently tagged `amd-nemotron-m1` at commit
-`22dbe1c`. Native CUDA validation is still required before upstream submission
-because this machine contains no NVIDIA device or CUDA toolkit; see
+The first promoted state is permanently tagged `amd-nemotron-m1` at commit
+`22dbe1c`; the completed research state is tagged `amd-nemotron-wave1` at
+`26f5485`. Native CUDA is untested and outside the AMD release gate. Any
+upstream proposal must state that scope plainly; see
 [`DEC-0002`](decisions/DEC-0002-native-cuda-validation.md).
 
 A broader promoted-state quality baseline now covers nine cases per GPU:
@@ -245,9 +246,10 @@ served ceiling. See [`convolution/`](convolution/).
 
 Wave 1's optimization search is therefore complete under
 [`STOPPING-POLICY.md`](STOPPING-POLICY.md). EXP-0004 remains unassigned. The
-next phase is native CUDA validation and upstreaming of EXP-0003, followed by
-packaging and release documentation; optimization only reopens for a new
-production-observed mechanism that passes the stopping policy.
+next phase is the AMD-ready fork release and an explicitly HIP-tested upstream
+proposal for EXP-0003. Native CUDA validation is neither claimed nor required
+for the AMD release. Optimization only reopens for a new production-observed
+mechanism that passes the stopping policy.
 
 No optimization is promoted from a microbenchmark alone. Complete served
 streaming requests and the frozen quality panel remain the final gates.
