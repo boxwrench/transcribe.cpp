@@ -1,0 +1,22 @@
+diff --git a/ggml/src/ggml-cuda/ggml-cuda.cu b/ggml/src/ggml-cuda/ggml-cuda.cu
+index 33acf0a..ae283b3 100644
+--- a/ggml/src/ggml-cuda/ggml-cuda.cu
++++ b/ggml/src/ggml-cuda/ggml-cuda.cu
+@@ -1854,6 +1854,17 @@ static void ggml_cuda_mul_mat(ggml_backend_cuda_context & ctx, const ggml_tensor
+         ggml_cuda_mul_mat_f(ctx, src0, src1, nullptr, dst);
+         return;
+     }
++    if (src0->type == GGML_TYPE_Q8_0 && ne11 == 2) {
++        const char * diagnostic_path = getenv("GGML_CUDA_FFN_PATH");
++        if (diagnostic_path != nullptr && strcmp(diagnostic_path, "mmq") == 0) {
++            ggml_cuda_mul_mat_q(ctx, src0, src1, nullptr, dst);
++            return;
++        }
++        if (diagnostic_path != nullptr && strcmp(diagnostic_path, "cublas") == 0) {
++            ggml_cuda_mul_mat_cublas(ctx, src0, src1, dst);
++            return;
++        }
++    }
+     if (ggml_cuda_should_use_mmvq(src0->type, cc, ne11)) {
+         ggml_cuda_mul_mat_vec_q(ctx, src0, src1, nullptr, dst);
+         return;

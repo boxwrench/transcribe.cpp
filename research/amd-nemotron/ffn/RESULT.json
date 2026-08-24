@@ -1,0 +1,47 @@
+{
+  "schema": "amd-nemotron-ffn-production-screen-v1",
+  "status": "PARK_BELOW_HEADROOM_GATE",
+  "experiment_assigned": false,
+  "gate": {
+    "minimum_local_headroom_percent": 30.0,
+    "minimum_served_ceiling_percent": 3.0
+  },
+  "production_chain": {
+    "occurrences_n2": 3312,
+    "tail_occurrences_n1": 48,
+    "first_projection": {"M": 4096, "N": 2, "K": 1024, "weight_type": "q8_0", "input_type": "f32"},
+    "activation": {"elements": "4096x2", "op": "UNARY"},
+    "second_projection": {"M": 1024, "N": 2, "K": 4096, "weight_type": "q8_0", "input_type": "f32"},
+    "stock_path": "Q8_0 MMVQ with input quantize_q8_1"
+  },
+  "stable_phase_decomposition_ms": {
+    "gfx1100": {"first_projection": 47.031561, "activation": 6.008431, "second_projection": 46.619409, "chain": 99.659401},
+    "gfx1201": {"first_projection": 73.045094, "activation": 4.603202, "second_projection": 44.415663, "chain": 122.063959}
+  },
+  "microbenchmark": {
+    "protocol": "five interleaved blocks; 50 warmups and 1000 measured dispatches per path/shape; graphs disabled",
+    "gfx1100_mean_us": {
+      "stock_mmvq": {"first": 27.6205802, "second": 27.1658826},
+      "mmq": {"first": 29.4199248, "second": 40.4579950},
+      "hipblas": {"first": 47.1530196, "second": 53.0550508}
+    },
+    "gfx1201_mean_us": {
+      "stock_mmvq": {"first": 39.5090108, "second": 30.2718334},
+      "mmq": {"first": 30.5701740, "second": 40.0285800},
+      "hipblas": {"first": 51.5565932, "second": 60.6512922}
+    },
+    "maximum_absolute_error": {
+      "stock_mmvq": 0.000001,
+      "mmq": 0.001640,
+      "hipblas": 0.064475
+    }
+  },
+  "best_candidate": {
+    "description": "gfx1201-only MMQ for the first projection; retain MMVQ for the second",
+    "first_projection_local_speedup_percent": 22.62,
+    "projected_full_chain_speedup_percent": 13.54,
+    "projected_served_speedup_percent": 1.62,
+    "gfx1100_benefit": false
+  },
+  "decision": "No existing path supplies 30% local headroom. Do not create EXP-0004; park LEAD-0003 and make LEAD-0007 primary. EXP-0002's four-wavefront geometry remains killed."
+}

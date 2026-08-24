@@ -134,6 +134,10 @@ paths, and checksums stay consistent.
 - `experiments/EXP-0003/` contains the promoted affine layer-normalization
   fusion, shape-complete H1 evidence, 120-request ABBA H2 evidence, and quality
   validation.
+- `quality-baseline/` freezes the broader post-promotion cross-GPU transcript
+  baseline across both models, multiple audio conditions, and lookaheads.
+- `ffn/` contains the bounded production-shape path screen and its park
+  decision; it is an investigation, not EXP-0004.
 - `investigations/LEAD-0005/` contains the measurement-only gfx1201
   served-time reconciliation and its observer-effect-qualified first attempt.
 - `decisions/` records qualifications that affect valid measurements.
@@ -173,16 +177,20 @@ The measured graph-benefit differential explains about 61 ms of the 148 ms
 production gap, leaving roughly 87 ms that aggregate kernel duration does not
 explain. Phase behavior is architecture-specific: gfx1201 is slower in FFN and
 convolution but faster in attention, cache/state, and elementwise/layout. This
-lead is now the primary investigation. It must reconcile request, GPU busy and
-idle, HIP API, graph create/update/launch, copies, synchronization, CPU
-frontend, RNNT decode, and residual time. Counts, transfer bytes, inter-kernel
-gaps, GPU busy fraction, and CPU blocked fraction are mandatory. No
-optimization work is allowed during this measurement phase.
+lead was investigated as measurement-only work: no optimization was allowed
+until request, HIP API, graph, synchronization, and frontend timing had been
+reconciled. Attempt 2 below supplied the bounded answer and parked the lead.
 
 The promoted state is permanently tagged `amd-nemotron-m1` at commit
 `22dbe1c`. Native CUDA validation is still required before upstream submission
 because this machine contains no NVIDIA device or CUDA toolkit; see
 [`DEC-0002`](decisions/DEC-0002-native-cuda-validation.md).
+
+A broader promoted-state quality baseline now covers nine cases per GPU:
+short, conversational, noisy, and long English; German multilingual; and
+right-lookahead values from 0 through 13. All nine transcript artifacts match
+byte-for-byte between gfx1100 and gfx1201 (967 words per target, zero
+mismatches). See [`quality-baseline/`](quality-baseline/).
 
 LEAD-0006 separately preserves the deterministic long-stream RNNT numerical
 divergence exposed by EXP-0003. It remains parked unless the broader quality
@@ -214,9 +222,17 @@ The fresh post-EXP-0003 profile confirms that all 10,080 affine-LayerNorm
 triplets are gone. No remaining pure elementwise/layout chain clears a 3%
 impossible-elimination ceiling on both GPUs. FFN production-shape chains now
 rank first (11–12% family ceiling), followed by convolution (about 7% on both)
-and attention (5–8%). These are leads only; `EXP-0004` remains unassigned until
-one has a specific mechanism and falsifiable intervention. See the
+and attention (5–8%). See the
 [`post-fusion profile`](phase-map/POST-EXP-0003.md).
+
+The bounded FFN investigation decomposed all 3,312 material
+`MUL_MAT -> UNARY -> MUL_MAT` chains and screened exact N=2 production shapes
+through the existing MMVQ, MMQ, and hipBLAS routes. The best candidate was a
+gfx1201-only MMQ route for the first projection: 22.62% faster locally, but
+only 13.54% projected for the full FFN chain and roughly 1.62% served. It
+misses the frozen 30% local-headroom and 3% served gates. LEAD-0003 is parked,
+EXP-0004 remains unassigned, and LEAD-0007 direct depthwise convolution is now
+the sole primary optimization investigation. See [`ffn/`](ffn/).
 
 No optimization is promoted from a microbenchmark alone. Complete served
 streaming requests and the frozen quality panel remain the final gates.

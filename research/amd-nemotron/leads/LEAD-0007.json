@@ -10,6 +10,6 @@
   "cheapest_falsifier": "Freeze the complete production convolution shape/layout histogram and benchmark the current CONV_2D_DW path against one direct contiguous specialization before changing served code.",
   "correctness_risk": "medium: convolution arithmetic and layout changes require tensor and transcript checks",
   "implementation_cost": "P2 localized kernel investigation",
-  "priority": "P2",
-  "status": "OPEN-POSTFUSION-SECONDARY"
+  "priority": "P1",
+  "status": "OPEN-POSTFUSION-PRIMARY-AFTER-FFN-PARK"
 }

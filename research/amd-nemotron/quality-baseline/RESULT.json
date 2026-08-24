@@ -1,0 +1,32 @@
+{
+  "schema": "amd-nemotron-promoted-quality-baseline-v1",
+  "runtime_commit": "1a4d168b7b7a61a87c06fd9d73425eaa6ac31cd8",
+  "targets": ["gfx1100", "gfx1201"],
+  "raw_manifest_sha256": {
+    "gfx1100": "6a14d53ca99ae3a89e69f1dd1732a2368c7c6361500fdb75cfc50296690fb4f9",
+    "gfx1201": "ba6ec845b3c2d0cffc81459c6ee0ee63a72aa395cb76ff8298b5531290543dae"
+  },
+  "stream_chunk_ms": 80,
+  "models": {
+    "english_sha256": "90d8c89714cd31efc88be62a40c6b2bea57e0cc2063af1ffe2c28f1a228ca110",
+    "multilingual_sha256": "b94545b313b3223fda7b2857a52681da813935c2127643d1e9ff0c23d988089c"
+  },
+  "cases": {
+    "english-short-r0": {"words": 22, "sha256": "7ba55da2972b7be95477bf4c32926d5fc220973d8892b6b16c135ef1a1585213", "cross_gpu": "MATCH"},
+    "english-short-r1": {"words": 22, "sha256": "7ba55da2972b7be95477bf4c32926d5fc220973d8892b6b16c135ef1a1585213", "cross_gpu": "MATCH"},
+    "english-short-r6": {"words": 22, "sha256": "8d7d44eb38e4e38626c14bbadbc28fc67c6cd8b49b688f6c4da79402eb4bcfce", "cross_gpu": "MATCH"},
+    "english-conversation-r1": {"words": 323, "sha256": "b39eadf2b37cab9ab0c7900993a05b4a30f7f0e7823b8923facb8ddbdd0f54b5", "cross_gpu": "MATCH"},
+    "english-noise-r1": {"words": 0, "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b", "cross_gpu": "MATCH"},
+    "english-long-r1": {"words": 512, "sha256": "1d5894f6618981ea2f38e7de68e0353478377273a7c4bed1fe083fcfa55f870e", "cross_gpu": "MATCH"},
+    "multilingual-de-r0": {"words": 22, "sha256": "26b36273fa02f74276407dc3c00b72e20f31db00fc2e9dd6a1309f90d07ad07f", "cross_gpu": "MATCH"},
+    "multilingual-de-r3": {"words": 22, "sha256": "3c8df80a5862b3fbdff703c5a5381db461719ed17473158c2678370ca33e12fd", "cross_gpu": "MATCH"},
+    "multilingual-de-r13": {"words": 22, "sha256": "8d1a1f6435cb69e479bde95423672390d6e9fd6ae6602ed64a312501235e1193", "cross_gpu": "MATCH"}
+  },
+  "summary": {
+    "cases_per_gpu": 9,
+    "cross_gpu_exact_matches": 9,
+    "cross_gpu_mismatches": 0,
+    "words_per_gpu": 967,
+    "decision": "PASS"
+  }
+}

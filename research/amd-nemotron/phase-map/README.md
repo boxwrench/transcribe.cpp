@@ -6,6 +6,10 @@ names, operation, and shape through compile-time ROCTx ranges and
 0, disabled HIP graphs, the English Q8_0 model, `jfk.wav`, 80 ms feeds, and
 attention right context 1. Profiling time is not production latency.
 
+The diagnostic label also records destination/source dtypes, full source
+shapes, and byte strides. Those fields support exact production-shape and
+backend-path investigations such as the bounded FFN screen.
+
 | Phase | gfx1100 kernel ms / share | gfx1201 kernel ms / share |
 | --- | ---: | ---: |
 | FFN | 113.037 / 26.28% | 129.862 / 30.18% |
